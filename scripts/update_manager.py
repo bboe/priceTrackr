@@ -42,32 +42,41 @@ class NewEggCrawler(object):
 class NewEggCrawlHandler(crawle.Handler):
     ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                 'Product.aspx\?Item=([A-Z0-9]+)']))
+    map_url = 'http://www.newegg.com/Product/MappingPrice.aspx?Item='
 
     def __init__(self):
         time = datetime.datetime.isoformat(datetime.datetime.now())
         self.working_dir = './%s_pages' % time
         self.error_dir = './%s_errors' % time
 
-    def handle_error(id, rr):
+    def handle_error(self, id, rr):
         if not os.path.exists(self.error_dir):
-            os.mkdir(error_dir)
+            os.mkdir(self.error_dir)
         path = os.path.join(self.error_dir, id)
         if os.path.exists(path):
             print 'Already errored: %s' % id
             return False
         output = open(path, 'w')
-        cPickle.dump(rr, output, cpickle.HIGHEST_PROTOCOL)
+        cPickle.dump(rr, output, cPickle.HIGHEST_PROTOCOL)
         output.close()
         return True
     
     def save_page(self, id, rr):
-        if not os.path.exists(self.work_dir):
-            os.mkdir(work_dir)
-        print id
+        if not os.path.exists(self.working_dir):
+            os.mkdir(self.working_dir)
         path = os.path.join(self.working_dir, '%s.html' % id)
         output = open(path, 'w')
         output.write(rr.responseBody)
         output.close()
+
+    def preProcess(self, rr):
+        match = self.ID_RE.match(rr.requestURL)
+        if match:
+            id = match.group(1)
+            rr.responseURL = ''.join([self.map_url, id])
+        else:
+            print rr.requestURL
+            rr.responseURL = None
 
     def process(self, rr, queue):
         id = self.ID_RE.match(rr.requestURL).group(1)
@@ -89,4 +98,4 @@ if __name__ == '__main__':
         print len(crawler.urls)
         sys.exit(0)
 
-    crawler.do_crawl(5)
+    crawler.do_crawl(10)
