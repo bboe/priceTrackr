@@ -46,4 +46,3 @@ Nifty("ul#nav a","transparent bottom");
 </div>
 <?php require_once("includes/nav.php"); ?>
 <div id="content">
-<p class="mesg">The priceTrackr service has been down since 2007-01-05. The content represented on these pages is valid only up until that date.</p>
