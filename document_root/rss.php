@@ -41,7 +41,7 @@ if ($data = $Cache_Lite->get($id)) {
 
 	<channel>
 		<title>priceTrackr Daily Drops</title>
-		<link>http://www.pricetrackr.com/daily.php</link>
+		<link>http://www.pricetrackr.com/daily/</link>
 		<description>Official priceTrackr RSS Feed. Lists items with a significant drop in prices. The prices shown include shipping, rebates, and savings.</description>
 		<language>en-us</language>
 		<lastBuildDate><?php echo date('D, d M Y H:i:s T'); ?></lastBuildDate>

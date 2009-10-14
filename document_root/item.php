@@ -59,7 +59,7 @@ if ($data = $Cache_Lite->get($id)) {
 		// Check to make sure the item wasn't added today		
 		if (!($result[0]['s_date'] == date('Y-m-d'))) {
 			require_once 'includes/chart/charts.php';
-			echo InsertChart ('/static_content/scripts/charts.swf', '/static_content/charts_library', '/includes/graph.php?item='.$_GET['item'],500,250,'C8E9FF',true);
+			echo InsertChart ('/static_content/scripts/charts.swf', '/static_content/charts_library', '/g/'.$_GET['item'],500,250,'C8E9FF',true);
 		}
 		else print '<p class="mesg">This item was added within the last 24 hours and therefore no chart will be displayed.</p>';
 

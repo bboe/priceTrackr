@@ -35,7 +35,6 @@ if ($data = $Cache_Lite->get($id)) {
 <p>Using all of these we calculate the out the door price on items on a day by day basis.
 </p>
 <p>At this time it is only possible to find items through the search.  A browse by category section will be added soon.</p>
-<p>If you can't find an item that you would like tracked please <a href="/add.php">add it</a>.</p>
 <h2>priceTrackr News</h2>
 <p>2009-10-15 - priceTrackr is back!</p>
 <p>2007-01-21 - So priceTrackr probably wont be coming back up as I cannot afford a dedicated server and the tracking scripts "utilize too many resources" which is complete BS. As the whole purpose of this website was to aid in making purchases I offer the following link. <a href="http://labs.anandtech.com/">labs.anandtech.com</a>.</p>

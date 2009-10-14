@@ -44,7 +44,7 @@ Nifty("ul#nav a","transparent bottom");
 <!-- How can I do this without a table? -->
 <tr valign="bottom">
 <td><h1>priceTrackr</h1></td>
-<td style="text-align:right;padding-bottom:5px"><form method="get" action="/search.php">
+<td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
 	<div>
 	<input type="text" name="q" id="searchInput" value="search..." size="20" maxlength="100" onfocus="searchInputClick();" onblur="searchInputBlur();" />
 	<input type="image" alt="Submit" src="/static_content/images/search.png" style="vertical-align:middle" />

@@ -1,4 +1,6 @@
 RewriteEngine On
+RewriteRule ^g/?$ / [R]
+RewriteRule ^g/([A-Z0-9]+)/?$ graph.php?item=$1 [L]
 RewriteRule ^i/?$ / [R]
 RewriteRule ^i/([A-Za-z0-9-]+)/?$ item.php?item=$1 [L]
 RewriteRule ^r/?$ / [R]
@@ -8,3 +10,4 @@ RewriteRule ^contact/$ contact_form.php [L]
 RewriteRule ^daily/$ daily.php [L]
 RewriteRule ^error/$ error.php [L]
 RewriteRule ^faq/$ faq.php [L]
+RewriteRule ^search/$ search.php [L]

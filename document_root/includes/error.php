@@ -32,7 +32,7 @@ function php_error_handler ($errno, $errstr, $errfile, $errline) {
 	$mesg .= var_export($_SESSION,true);
       }
       error_log($mesg,1,$email,'From: ADMIN <errorLog@pricetrackr.com>');
-      header('Location: /error.php');
+      header('Location: /error/');
       exit(1);
     }
     

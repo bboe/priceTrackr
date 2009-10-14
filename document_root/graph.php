@@ -2,8 +2,8 @@
 require_once('Cache/Lite.php');
 
 if(!isset($_GET['item'])) {
-	header('Location: /');
-	exit();
+  header('Location: /');
+  exit();
 }
 
 // Set a id for this cache
@@ -24,8 +24,8 @@ if ($data = $Cache_Lite->get($cacheID)) {
 } else { // No valid cache found (you have to make the page)
 	ob_start();
 	define('START', true);
-	require_once 'myDB.php';
-	require_once 'chart/charts.php';
+	require_once 'includes/myDB.php';
+	require_once 'includes/chart/charts.php';
 
 	$id = $_GET['item'];
 
