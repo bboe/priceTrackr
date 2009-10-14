@@ -1,7 +1,6 @@
 RewriteEngine On
 RewriteRule ^i/?$ / [R]
 RewriteRule ^i/([A-Za-z0-9-]+)/?$ item.php?item=$1 [L]
-RewriteRule ^c/?$ / [R]
-RewriteRule ^c/([A-Za-z0-9-]+)/?$ contactForm.php?type=$1 [L]
+RewriteRule ^contact/?$ contact.php [L]
 RewriteRule ^r/?$ / [R]
 RewriteRule ^r/([A-Za-z0-9-]+)/?$ rss.php?feed=$1 [L]
