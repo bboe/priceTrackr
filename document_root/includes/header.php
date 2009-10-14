@@ -17,7 +17,17 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <link rel="stylesheet" type="text/css" href="/static_content/style/layout.css" />
 <link rel="alternate" type="application/rss+xml" title="priceTrackr Daily Drops" href="http://www.pricetrackr.com/r/dailyDrops/" />
 <script type="text/javascript" src="/static_content/scripts/niftycube.js"></script>
-<script type="text/javascript" src="/static_content/scripts/functions.js"></script>
+<script type="text/javascript">
+function searchInputClick() {
+	input = document.getElementById('searchInput')
+	if (input.value == 'search...') input.value = ''
+}
+
+function searchInputBlur() {
+	input = document.getElementById('searchInput')
+	if (input.value == '') input.value = 'search...'
+}
+</script>
 <script type="text/javascript">
 window.onload=function() {
 Nifty("div#container");
