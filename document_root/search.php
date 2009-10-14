@@ -22,7 +22,7 @@ if (isset($_GET['q'])) {
 	  print '<p class="query">Query:<i>'.$q.'</i></p>';
 	  $size = sizeof($result);
 	  if ($size == 0) {
-	    print '<p>No results found. Please contact us if you believe priceTrackr is missing something.</p>';
+	    print '<p>No results found. Please <a href="/contact/">contact us</a> if you believe priceTrackr is missing something.</p>';
 	  }
 	  else if ($size == 1) {
 	    header('Location: /i/'.$result[0]['id'].'/');

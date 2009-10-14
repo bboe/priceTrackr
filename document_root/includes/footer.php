@@ -6,7 +6,7 @@ $db->free();
 ?>
 
 <div id="footer">
-<div class="copyright">&copy; 2008 priceTrackr.  All Rights Reserved</div>
+<div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
 </div>
 </div>
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
