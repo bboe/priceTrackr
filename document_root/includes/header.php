@@ -15,7 +15,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <title>priceTrackr - <?php require_once 'title.php'?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <link rel="stylesheet" type="text/css" href="/static_content/style/layout.css" />
-<link rel="stylesheet" type="text/css" href="/static_content/style/niftyCorners.css" />
 <link rel="alternate" type="application/rss+xml" title="priceTrackr Daily Drops" href="http://www.pricetrackr.com/r/dailyDrops/" />
 <script type="text/javascript" src="/static_content/scripts/niftycube.js"></script>
 <script type="text/javascript" src="/static_content/scripts/functions.js"></script>
