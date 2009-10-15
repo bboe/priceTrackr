@@ -42,7 +42,15 @@ class NewEggCrawler(object):
 class NewEggCrawlHandler(crawle.Handler):
     ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                 'Product.aspx\?Item=([A-Z0-9]+)']))
-    map_url = 'http://www.newegg.com/Product/MappingPrice.aspx?Item='
+    MAP_URL = 'http://www.newegg.com/Product/MappingPrice.aspx?Item='
+    CART_URL = 'http://secure.newegg.com/Shopping/ShoppingCart.aspx'
+
+    ZIP_COOKIE = ''.join(['NV%5FORDERCOOKIE=#4%7b%22Sites%22%3a%7b%22USA%22',
+                          '%3a%7b%22Values%22%3a%7b',
+                          '%22NVS%255FCUSTOMER%255FSHIPPING%255FMETHOD1%22',
+                          '%3a%22038%22%2c',
+                          '%22NVS%255FCUSTOMER%255FZIP%255FCODE%22%3a',
+                          '%2293117%22%7d%7d%7d%7d'])
 
     def __init__(self):
         time = datetime.datetime.isoformat(datetime.datetime.now())
@@ -73,10 +81,26 @@ class NewEggCrawlHandler(crawle.Handler):
         match = self.ID_RE.match(rr.requestURL)
         if match:
             id = match.group(1)
-            rr.responseURL = ''.join([self.map_url, id])
+            rr.responseURL = ''.join([self.MAP_URL, id])
         else:
             print rr.requestURL
             rr.responseURL = None
+
+    def cart_preProcess(self, rr):
+        match = self.ID_RE.match(rr.requestURL)
+        if match:
+            id = match.group(1)
+            rr.responseURL = self.CART_URL
+            c_id = ''.join(['NV%5FNEWEGGCOOKIE=#4{"Sites":{"USA":{"Values":{"',
+                            self.transform_id(id), '":"1"}}}}'])
+            rr.requestHeaders = {'Cookie':';'.join([self.ZIP_COOKIE, c_id])}
+        else:
+            print rr.requestURL
+            rr.responseURL = None
+
+    @staticmethod
+    def transform_id(id):
+        return '%s-%s-%s' % (id[7:9], id[9:12], id[12:])
 
     def process(self, rr, queue):
         match = self.ID_RE.match(rr.requestURL)
@@ -97,7 +121,9 @@ if __name__ == '__main__':
     parser.add_option('--count', action='store_true', default=False,
                       help='only display count of items from sitemap')
     parser.add_option('--mapping', action='store_true', default=False,
-                      help='crawls mapping pages rather than item pages')
+                      help='crawl mapping pages')
+    parser.add_option('--cart', action='store_true', default=False,
+                      help='crawl cart pages')
     options, args = parser.parse_args()
       
     crawler = NewEggCrawler()
@@ -107,6 +133,9 @@ if __name__ == '__main__':
     if options.mapping:
         print 'Crawling mapping pages'
         crawler.handler.preProcess = crawler.handler.mapping_preProcess
+    elif options.cart:
+        print 'Crawling cart pages'
+        crawler.handler.preProcess = crawler.handler.cart_preProcess
     else:
         print 'Crawling item pages'
 
