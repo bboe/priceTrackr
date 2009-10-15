@@ -20,8 +20,8 @@ class PageParser(object):
     regx['shipping'] = re.compile(''.join(['<dd class="shipping">Free ',
                                            'Shipping\*\s*</dd>'])), 0
 
-    def __init__(self, dir):
-        self.mapping_dir = '%s_mapping' % dir.split('_')[0]
+    def __init__(self, date_dir):
+        self.mapping_dir = os.path.join(date_dir, 'mapping')
 
     @staticmethod
     def __re_search(body, regex, group):
@@ -109,17 +109,19 @@ class PageParser(object):
                     
         
 if __name__ == '__main__':
-    dir = '2009-10-13_products'
-    pages = os.listdir(dir)
-    pp = PageParser(dir)
+    date_dir = sys.argv[1]
+    items_dir = os.path.join(date_dir, 'items')
+    pages = os.listdir(items_dir)
+    pp = PageParser(date_dir)
     items = {}
+
     for page in pages:
         id = page.split('.')[0]
-        page = os.path.join(dir, page)
+        page = os.path.join(items_dir, page)
         body = open(page).read()
         items[id] = pp.parse_item_page(id, body)
 
-    output = open('2009-10-13.pkl', 'w')
+    output = open('%s.pkl' % date_dir.strip('/'), 'w')
     cPickle.dump(items, output, cPickle.HIGHEST_PROTOCOL)
     output.close()
     sys.exit(1)

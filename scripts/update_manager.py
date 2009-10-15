@@ -69,17 +69,22 @@ class NewEggCrawlHandler(crawle.Handler):
         output.write(rr.responseBody)
         output.close()
 
-    def preProcess(self, rr):
+    # def preProcess(self, rr):
+    #     match = self.ID_RE.match(rr.requestURL)
+    #     if match:
+    #         id = match.group(1)
+    #         rr.responseURL = ''.join([self.map_url, id])
+    #     else:
+    #         print rr.requestURL
+    #         rr.responseURL = None
+
+    def process(self, rr, queue):
         match = self.ID_RE.match(rr.requestURL)
         if match:
             id = match.group(1)
-            rr.responseURL = ''.join([self.map_url, id])
         else:
             print rr.requestURL
-            rr.responseURL = None
-
-    def process(self, rr, queue):
-        id = self.ID_RE.match(rr.requestURL).group(1)
+            return
         if rr.responseStatus != 200:
             if self.handle_error(id, rr):
                 queue.put(rr.responseURL)
