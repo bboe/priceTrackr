@@ -3,25 +3,38 @@ import cPickle, os, re, sys, time
 
 class PageParser(object):
     regx = {}
+    # Item Info
     regx['title'] = re.compile('<title>Newegg.com - ([^<]+)</title>'), 1
     regx['model'] = re.compile(''.join(['<td class="name">\s?(kits_)?Model',
                                         '</td>\s*<td class="desc"',
                                         '>([^<]+(<br>)?[^<]*)</td>'])), 2
+    # Item Flags
     regx['cart'] = re.compile('title="Sale Price">See price in cart</a>'), 0
     regx['deactivated'] = re.compile('Deactivated Item'), 0
+    regx['free_shipping'] = re.compile(''.join(['<dd class="shipping">Free ',
+                                                'Shipping\*?\s*</dd>'])), 0
+
+    # Item / Mapping Price Info
     regx['original'] = re.compile(''.join(['<dd class="original">Original ',
                                            'Price: \$([^<]+)</dd>'])), 1
     regx['save'] = re.compile(''.join(['<dd class="rebate">You Save: \$',
                                        '([^<]+)</dd>'])), 1
     regx['price'] = re.compile('<h3 class="zmp">\s*\$([^<]+)\s*</h3>'), 1
-    regx['rebate'] = re.compile(''.join(['<strong>\$[^<]+</strong> after ',
-                                         '\$([^ ]+) Mail-In Rebate'])), 1
-    regx['map_rebate'] = re.compile('Before \$([^ ]+) Mail-In Rebate'), 1
-    regx['shipping'] = re.compile(''.join(['<dd class="shipping">Free ',
-                                           'Shipping\*\s*</dd>'])), 0
+    regx['rebate'] = re.compile('\$([^ ]+) Mail-(i|I)n Rebate'), 1
+
+    # Cart Page Specific
+    regx['cart_unavailable'] = re.compile('removed from shopping cart due'), 0
+    regx['cart_original'] = re.compile('<dd class="cartOrig">\$([^<]+)</dd'), 1
+    regx['cart_save'] = re.compile(''.join(['<td class="cartSavings">\s*-\$',
+                                            '([0-9.]+)&nbsp;Instant<br>'])), 1
+    regx['cart_price'] = re.compile('<dd>\$([^<]+)</dd>'), 1
+    regx['cart_shipping'] = re.compile(''.join(['<td>Shipping:</td>\s*<td>',
+                                                '<strong>\$([^<]+)</strong>',
+                                                '</td>'])), 1    
 
     def __init__(self, date_dir):
         self.mapping_dir = os.path.join(date_dir, 'mapping')
+        self.cart_dir = os.path.join(date_dir, 'cart')
 
     @staticmethod
     def __re_search(body, regex, group):
@@ -50,12 +63,47 @@ class PageParser(object):
         #     print 'Missing Price: %s' % id
         #     return None
         info['rebate'] = self.__re_search(body, *self.regx['rebate'])
-        if not info['rebate']:
-            info['rebate'] = self.__re_search(body, *self.regx['map_rebate'])
-            # REBATE TEST
-            # if not info['rebate'] and 'Mail-In Rebate' in body:
-            #     print 'Missing Rebate: %s' % id
-            #     return None
+        # REBATE TEST
+        # if not info['rebate'] and 'Mail-In Rebate' in body:
+        #     print 'Missing Rebate: %s' % id
+        #     return None
+        return info
+
+    def parse_cart_page(self, id, body, free_shipping):
+        info = {}
+        if self.__re_search(body, *self.regx['cart_unavailable']):
+            print '%s: unavailable' % id
+            return None
+        
+        info['original'] = self.__re_search(body, *self.regx['cart_original'])
+        # ORIGINAL TEST
+        if not info['original'] and 'cartOrig' in body:
+            print 'Missing Original: %s' % id
+            return None
+        info['save'] = self.__re_search(body, *self.regx['cart_save'])
+        # SAVE TEST
+        if not info['save'] and 'Instant' in body:
+            print 'Missing Saving: %s' % id
+            return None
+        info['rebate'] = self.__re_search(body, *self.regx['rebate'])
+        # REBATE TEST
+        if not info['rebate'] and 'Mail-In Rebate' in body:
+            print 'Missing Rebate: %s' % id
+            return None
+        info['price'] = self.__re_search(body, *self.regx['cart_price'])
+        # PRICE TEST
+        if not info['price']:
+            print 'Missing Price: %s' % id
+            return None
+        info['shipping'] = self.__re_search(body, *self.regx['cart_shipping'])
+        # SHIPPING TEST
+        if not info['shipping']:
+            print 'Missing Shipping: %s' % id
+            return None
+        if  info['shipping'] == '0.00' and not free_shipping:
+            print 'Inconsistent Shipping: %s' % id
+            return None
+
         return info
 
     def parse_item_page(self, id, body):
@@ -75,14 +123,27 @@ class PageParser(object):
             #     return None
             info['deactivated'] = True
             return info
-        if self.__re_search(body, *self.regx['shipping']):
+        if self.__re_search(body, *self.regx['free_shipping']):
             info['free_shipping'] = True
         # FREE SHIPPING TEST
-        # elif 'Free Shipping*' in body:
-        #     print id
+        elif '">Free Shipping' in body:
+            print 'Failed free shipping: %s' % id
         if self.__re_search(body, *self.regx['cart']):
             body = open(os.path.join(self.mapping_dir, '%s.html' % id)).read()
-            info.update(self.parse_mapping_page(id, body))
+            mapping = self.parse_mapping_page(id, body)
+            body = open(os.path.join(self.cart_dir, '%s.html' % id)).read()
+            cart = self.parse_cart_page(id, body, 'free_shipping' in info)
+
+            for key in mapping:
+                if cart and mapping[key] != cart[key]:
+                    print 'difference in %s %s: %s %s' % (id, key,
+                                                          mapping[key],
+                                                          cart[key])
+
+            if cart:
+                info.update(cart)
+            return info
+        else:
             return info
         info['original'] = self.__re_search(body, *self.regx['original'])
         # ORIGINAL TEST
