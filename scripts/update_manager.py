@@ -69,14 +69,14 @@ class NewEggCrawlHandler(crawle.Handler):
         output.write(rr.responseBody)
         output.close()
 
-    # def preProcess(self, rr):
-    #     match = self.ID_RE.match(rr.requestURL)
-    #     if match:
-    #         id = match.group(1)
-    #         rr.responseURL = ''.join([self.map_url, id])
-    #     else:
-    #         print rr.requestURL
-    #         rr.responseURL = None
+    def mapping_preProcess(self, rr):
+        match = self.ID_RE.match(rr.requestURL)
+        if match:
+            id = match.group(1)
+            rr.responseURL = ''.join([self.map_url, id])
+        else:
+            print rr.requestURL
+            rr.responseURL = None
 
     def process(self, rr, queue):
         match = self.ID_RE.match(rr.requestURL)
@@ -96,11 +96,18 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option('--count', action='store_true', default=False,
                       help='only display count of items from sitemap')
+    parser.add_option('--mapping', action='store_true', default=False,
+                      help='crawls mapping pages rather than item pages')
     options, args = parser.parse_args()
-
+      
     crawler = NewEggCrawler()
     if options.count:
         print len(crawler.urls)
         sys.exit(0)
+    if options.mapping:
+        print 'Crawling mapping pages'
+        crawler.handler.preProcess = crawler.handler.mapping_preProcess
+    else:
+        print 'Crawling item pages'
 
     crawler.do_crawl(10)
