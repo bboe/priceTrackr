@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import crawle, cPickle, datetime, gzip, os, re, sys
+import crawle, cPickle, datetime, gzip, os, re, sys, threading
 from optparse import OptionParser
 from StringIO import StringIO
 
@@ -159,6 +159,8 @@ class NewEggCrawlHandler(crawle.Handler):
         self.working_dir = './%s' % time
         self.error_dir = './%s_errors' % time
         self.parser = PageParser()
+        self.lock = threading.Lock()
+        self.items = {}
 
     def handle_error(self, rr):
         if not os.path.exists(self.error_dir):
@@ -210,12 +212,20 @@ class NewEggCrawlHandler(crawle.Handler):
                 queue.put((id, 1))
         elif type == 1: # CART
             info = self.parser.parse_cart_page(id, rr.responseBody)
-            print id, info
+            if not info:
+                queue.put((id, 2))
+                return
         elif type == 2: # MAPPING
-            pass
+            info = self.parser.parse_mapping_page(id, rr.responseBody)
         else:
             raise 'Unknown Type'
-        #self.save_page(rr)
+        self.lock.acquire()
+        if type == 0:
+            self.items[id] = info
+        else:
+            self.items[id].update(info)
+        self.lock.release()
+        self.save_page(rr)
 
 
 if __name__ == '__main__':
@@ -226,11 +236,11 @@ if __name__ == '__main__':
                       help='start with only cart pages')
     parser.add_option('--mapping', action='store_true', default=False,
                       help='start with only mapping pages')
-    parser.add_option('--threads', default=1,
+    parser.add_option('--threads', default=1, type="int",
                       help='number of crawl threads (default: %default)')
-    parser.add_option('--limit', default=None,
+    parser.add_option('--limit', default=None, type="int",
                       help='limit of items to crawl (default: %default)')
-    parser.add_option('--start', default=0,
+    parser.add_option('--start', default=0, type="int",
                       help='item pos to start crawl (default: %default)')
     options, args = parser.parse_args()
       
@@ -245,5 +255,9 @@ if __name__ == '__main__':
     else:
         print 'Full crawl'
 
-    crawler.do_crawl(limit=int(options.limit), start=int(options.start),
+    crawler.do_crawl(limit=options.limit, start=options.start,
                      threads=options.threads)
+
+    output = open('output.pkl', 'w')
+    cPickle.dump(crawler.handler.items, output, cPickle.HIGHEST_PROTOCOL)
+    output.close()
