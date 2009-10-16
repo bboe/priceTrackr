@@ -78,9 +78,9 @@ class PageParser(object):
     def parse_item_page_price(self, id, body):
         """Return price tracking information, only used if free shipping"""
         info = {}
-        end = self.__re_search_pos(body, *self.regx['combo'])
+        end = self.__re_search_item_pos(body, *self.regx['combo'])
         if end:
-            body = body[:end]
+            body = body[:end[1]]
         info['original'] = self.__re_search(body, *self.regx['original'])
         info['save'] = self.__re_search(body, *self.regx['save'])
         info['price'] = self.__re_search(body, *self.regx['price'])
@@ -111,10 +111,10 @@ class NewEggCrawler(object):
     ITEM_ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                      'Product.aspx\?Item=([A-Z0-9]+)']))
 
-    def __init__(self, output_prefix):
+    def __init__(self, output_prefix, save):
         self.item_ids = []
         self.get_product_ids()
-        self.handler = NewEggCrawlHandler(output_prefix)
+        self.handler = NewEggCrawlHandler(output_prefix, save)
         self.queue = crawle.URLQueue()
 
     def get_product_ids(self):
@@ -157,7 +157,8 @@ class NewEggCrawlHandler(crawle.Handler):
     def transform_id(id):
         return '%s-%s-%s' % (id[7:9], id[9:12], id[12:])
     
-    def __init__(self, output_prefix):
+    def __init__(self, output_prefix, save):
+        self.save = save
         self.working_dir = './%s' % output_prefix
         self.error_dir = './%s_errors' % output_prefix
         self.parser = PageParser()
@@ -165,6 +166,7 @@ class NewEggCrawlHandler(crawle.Handler):
         self.items = {}
 
     def handle_error(self, rr):
+        if not self.save: return
         if not os.path.exists(self.error_dir):
             os.mkdir(self.error_dir)
         path = os.path.join(self.error_dir, '%s_%s' % rr.requestURL)
@@ -177,6 +179,7 @@ class NewEggCrawlHandler(crawle.Handler):
         return True
     
     def save_page(self, rr):
+        if not self.save: return
         if not os.path.exists(self.working_dir):
             os.mkdir(self.working_dir)
         path = os.path.join(self.working_dir, '%s_%s.html' % rr.requestURL)
@@ -237,6 +240,9 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option('--count', action='store_true', default=False,
                       help='only display count of items from sitemap')
+    parser.add_option('--no-save', action='store_true', default=False,
+                      dest='no_save',
+                      help='don\'t save items and output to screen')
     parser.add_option('--threads', default=1, type="int",
                       help='number of crawl threads (default: %default)')
     parser.add_option('--limit', default=None, type="int",
@@ -249,7 +255,7 @@ if __name__ == '__main__':
 
     output_prefix = time.strftime('%Y-%m-%d_%H.%M.%S', time.localtime())
       
-    crawler = NewEggCrawler(output_prefix)
+    crawler = NewEggCrawler(output_prefix, not options.no_save)
     if options.item != None:
         crawler.item_ids = options.item
 
@@ -260,8 +266,9 @@ if __name__ == '__main__':
     crawler.do_crawl(limit=options.limit, start=options.start,
                      threads=options.threads)
 
-    if options.item != None:
-        print crawler.handler.items
+    if options.no_save:
+        import pprint
+        pprint.pprint(crawler.handler.items)
         sys.exit(1)
 
     output = open('%s.pkl' % output_prefix, 'w')
