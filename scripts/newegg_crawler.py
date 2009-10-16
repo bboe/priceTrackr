@@ -66,6 +66,7 @@ class PageParser(object):
         if self.__re_search(body, *self.regx['cart_unavailable']):
             return None
 
+        body = body[body.find(id):]
         info['price'], p = self.__re_search_item_pos(body,
                                                      *self.regx['cart_price'])
         b2 = body[:p]
