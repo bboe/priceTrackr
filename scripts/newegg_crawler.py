@@ -44,10 +44,10 @@ class PageParser(object):
         else:
             return None
     @staticmethod
-    def __re_search_pos(body, regex, group):
+    def __re_search_item_pos(body, regex, group):
         match = regex.search(body)
         if match:
-            return match.start(group)
+            return match.group(group).strip(), match.start(group)
         else:
             return None
 
@@ -65,10 +65,13 @@ class PageParser(object):
         info = {}
         if self.__re_search(body, *self.regx['cart_unavailable']):
             return None
-        info['original'] = self.__re_search(body, *self.regx['cart_original'])
-        info['save'] = self.__re_search(body, *self.regx['cart_save'])
+
+        info['price'], p = self.__re_search_item_pos(body,
+                                                     *self.regx['cart_price'])
+        b2 = body[:p]
+        info['original'] = self.__re_search(b2, *self.regx['cart_original'])
+        info['save'] = self.__re_search(b2, *self.regx['cart_save'])
         info['rebate'] = self.__re_search(body, *self.regx['rebate'])
-        info['price'] = self.__re_search(body, *self.regx['cart_price'])
         info['shipping'] = self.__re_search(body, *self.regx['cart_shipping'])
         return info
 
@@ -108,10 +111,10 @@ class NewEggCrawler(object):
     ITEM_ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                      'Product.aspx\?Item=([A-Z0-9]+)']))
 
-    def __init__(self):
+    def __init__(self, output_prefix):
         self.item_ids = []
         self.get_product_ids()
-        self.handler = NewEggCrawlHandler()
+        self.handler = NewEggCrawlHandler(output_prefix)
         self.queue = crawle.URLQueue()
 
     def get_product_ids(self):
@@ -154,10 +157,9 @@ class NewEggCrawlHandler(crawle.Handler):
     def transform_id(id):
         return '%s-%s-%s' % (id[7:9], id[9:12], id[12:])
     
-    def __init__(self):
-        time_string = time.strftime('%Y-%m-%d_%H.%M.%S', time.localtime())
-        self.working_dir = './%s' % time_string
-        self.error_dir = './%s_errors' % time_string
+    def __init__(self, output_prefix):
+        self.working_dir = './%s' % output_prefix
+        self.error_dir = './%s_errors' % output_prefix
         self.parser = PageParser()
         self.lock = threading.Lock()
         self.items = {}
@@ -241,9 +243,16 @@ if __name__ == '__main__':
                       help='limit of items to crawl (default: %default)')
     parser.add_option('--start', default=0, type="int",
                       help='item pos to start crawl (default: %default)')
+    parser.add_option('--item', action='append',
+                     help='single item to crawl - can list multiple times')
     options, args = parser.parse_args()
+
+    output_prefix = time.strftime('%Y-%m-%d_%H.%M.%S', time.localtime())
       
-    crawler = NewEggCrawler()
+    crawler = NewEggCrawler(output_prefix)
+    if options.item != None:
+        crawler.item_ids = options.item
+
     print 'Found %d items' % len(crawler.item_ids)
     if options.count:
         sys.exit(0)
@@ -251,6 +260,10 @@ if __name__ == '__main__':
     crawler.do_crawl(limit=options.limit, start=options.start,
                      threads=options.threads)
 
-    output = open('output.pkl', 'w')
+    if options.item != None:
+        print crawler.handler.items
+        sys.exit(1)
+
+    output = open('%s.pkl' % output_prefix, 'w')
     cPickle.dump(crawler.handler.items, output, cPickle.HIGHEST_PROTOCOL)
     output.close()
