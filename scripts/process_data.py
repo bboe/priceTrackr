@@ -11,15 +11,22 @@ class ItemHistoryHelper(object):
         self.cost = self.convert_price(item['price'])
         if item['original'] != None:
             self.original = self.convert_price(item['original'])
-            try:
-                if self.original - self.convert_price(item['save']) != self.cost:
-                    print '%s cost mismatch' % id
-                    print self.original, self.cost, item['save']
-            except:
-               pass#print id
+            self.save = self.convert_price(item['save'])
         else:
             self.original = self.cost
-        #self.shipping = self.convert_price(item['shipping'])
+            self.save = 0
+        if item['rebate'] != None:
+            self.rebate = item['rebate']
+        else:
+            self.rebate = 0
+        if 'shipping' not in item:
+            self.shipping = 0
+        else:
+            self.shipping = self.convert_price(item['shipping'])
+
+    def verify_savings(self):
+        if self.original - self.save != self.cost:
+            print 'Savings Mismatch: %s' % self.id
 
 if __name__ == '__main__':
     def usage(msg=None):
@@ -40,6 +47,10 @@ if __name__ == '__main__':
     except Exception, e:
         raise
 
+    cost = None, 0
+    shipping = None, 0
+
     for id, item in items.items():
         if 'deactivated' in item: continue
-        ItemHistoryHelper(id, item)
+        i = ItemHistoryHelper(id, item)
+        i.verify_savings()
