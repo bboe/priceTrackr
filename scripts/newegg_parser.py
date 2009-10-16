@@ -214,31 +214,3 @@ if __name__ == '__main__':
     output = open('%s.pkl' % date_dir.strip('/'), 'w')
     cPickle.dump(items, output, cPickle.HIGHEST_PROTOCOL)
     output.close()
-    sys.exit(1)
-
-    
-    invalids = 0
-    deactivated = 0
-    free_shipping = 0
-    rebates = 0
-    saves = 0
-    for item in items.values():
-        if item is None:
-            invalids += 1
-            continue
-        if 'deactivated' in item:
-            deactivated += 1
-            continue
-        if 'free_shipping' in item:
-            free_shipping += 1
-        if item['rebate']:
-            rebates += 1
-        if 'save' in item and item['save']:
-            saves += 1
-
-    
-    print 'Invalid: %d' % invalids
-    print 'Deactivated: %d' % deactivated
-    print 'Free shipping: %d' % free_shipping
-    print 'Rebates: %d' % rebates
-    print 'Saves: %d' % saves
