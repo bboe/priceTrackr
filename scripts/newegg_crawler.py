@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import crawle, cPickle, datetime, gzip, os, re, sys, threading
+import crawle, cPickle, time, gzip, os, re, sys, threading
 from optparse import OptionParser
 from StringIO import StringIO
 
@@ -155,9 +155,9 @@ class NewEggCrawlHandler(crawle.Handler):
         return '%s-%s-%s' % (id[7:9], id[9:12], id[12:])
     
     def __init__(self):
-        time = datetime.datetime.isoformat(datetime.datetime.now())
-        self.working_dir = './%s' % time
-        self.error_dir = './%s_errors' % time
+        time_string = time.strftime('%Y-%m-%d_%H.%M.%S', time.localtime())
+        self.working_dir = './%s' % time_string
+        self.error_dir = './%s_errors' % time_string
         self.parser = PageParser()
         self.lock = threading.Lock()
         self.items = {}
@@ -200,7 +200,10 @@ class NewEggCrawlHandler(crawle.Handler):
             raise 'Unknown Type'
 
     def process(self, rr, queue):
-        if rr.responseStatus != 200:
+        if rr.responseStatus == None and rr.responseMsg == 'Socket Error':
+            queue.put(rr.requestURL)
+            return
+        elif rr.responseStatus != 200:
             self.handle_error(rr)
             return
         id, type = rr.requestURL
@@ -232,10 +235,6 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option('--count', action='store_true', default=False,
                       help='only display count of items from sitemap')
-    parser.add_option('--cart', action='store_true', default=False,
-                      help='start with only cart pages')
-    parser.add_option('--mapping', action='store_true', default=False,
-                      help='start with only mapping pages')
     parser.add_option('--threads', default=1, type="int",
                       help='number of crawl threads (default: %default)')
     parser.add_option('--limit', default=None, type="int",
@@ -245,15 +244,9 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
       
     crawler = NewEggCrawler()
+    print 'Found %d items' % len(crawler.item_ids)
     if options.count:
-        print len(crawler.urls)
         sys.exit(0)
-    if options.mapping:
-        print 'Crawling mapping pages'
-    elif options.cart:
-        print 'Crawling cart pages'
-    else:
-        print 'Full crawl'
 
     crawler.do_crawl(limit=options.limit, start=options.start,
                      threads=options.threads)
