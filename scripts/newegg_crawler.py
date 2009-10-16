@@ -167,8 +167,10 @@ class NewEggCrawlHandler(crawle.Handler):
 
     def handle_error(self, rr):
         if not self.save: return
+        self.lock.acquire()
         if not os.path.exists(self.error_dir):
             os.mkdir(self.error_dir)
+        self.lock.release()
         path = os.path.join(self.error_dir, '%s_%s' % rr.requestURL)
         if os.path.exists(path):
             print 'Already errored: %s - %s' % rr.requestURL
@@ -180,8 +182,10 @@ class NewEggCrawlHandler(crawle.Handler):
     
     def save_page(self, rr):
         if not self.save: return
+        self.lock.acquire()
         if not os.path.exists(self.working_dir):
             os.mkdir(self.working_dir)
+        self.lock.release()
         path = os.path.join(self.working_dir, '%s_%s.html' % rr.requestURL)
         output = open(path, 'w')
         output.write(rr.responseBody)
