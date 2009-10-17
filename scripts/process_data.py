@@ -8,24 +8,24 @@ class ItemHistoryHelper(object):
 
     def __init__(self, id, item):
         self.id = id
-        self.cost = self.convert_price(item['price'])
+        self.price = self.convert_price(item['price'])
         if item['original'] != None:
             self.original = self.convert_price(item['original'])
             self.save = self.convert_price(item['save'])
         else:
-            self.original = self.cost
+            self.original = self.price
             self.save = 0
         if item['rebate'] != None:
-            self.rebate = item['rebate']
+            self.rebate = self.price - self.convert_price(item['rebate'])
         else:
-            self.rebate = 0
+            self.rebate = self.price
         if 'shipping' not in item:
             self.shipping = 0
         else:
             self.shipping = self.convert_price(item['shipping'])
 
     def verify_savings(self):
-        if self.original - self.save != self.cost:
+        if self.original - self.save != self.price:
             print 'Savings Mismatch: %s' % self.id
 
 if __name__ == '__main__':
@@ -47,10 +47,19 @@ if __name__ == '__main__':
     except Exception, e:
         raise
 
-    cost = None, 0
-    shipping = None, 0
+    deactivated = 0
+    savings = 0
+    rebates = 0
 
     for id, item in items.items():
-        if 'deactivated' in item: continue
+        if 'deactivated' in item:
+            deactivated += 1
+            continue
         i = ItemHistoryHelper(id, item)
         i.verify_savings()
+        if i.save: savings += 1
+        if i.rebate != i.price: rebates += 1
+
+    print 'Deactivated: %d' % deactivated
+    print 'Savings: %d' % savings
+    print 'Rebates: %d' % rebates

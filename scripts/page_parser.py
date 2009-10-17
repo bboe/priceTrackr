@@ -116,9 +116,14 @@ if __name__ == '__main__':
         usage('File %s does not exist' % directory)
 
     parser = PageParser()
+
+    count = 0
         
     items = {}
     for fname in [x for x in os.listdir(directory) if '_0' in x]:
+        count += 1
+        if count % 1000 == 0:
+            print count
         id = fname.strip('_0.html')
         body = open(os.path.join(directory, fname)).read()
         info = parser.parse_item_page_info(id, body)
