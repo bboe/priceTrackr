@@ -113,10 +113,12 @@ class NewEggCrawlHandler(crawle.Handler):
             try:
                 if rr.responseMsg == 'Socket Error':
                     queue.put(rr.requestURL)
+                elif rr.responseMsg == 'Redirect count exceeded':
+                    pass
                 else:
-                    print rr.requestURL, rr.resposeMsg
+                    self.handle_error(rr)
             except:
-                print rr.requestURL
+                self.handle_error(rr)
             return
         elif rr.responseStatus != 200:
             self.handle_error(rr)
