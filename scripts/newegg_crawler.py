@@ -109,8 +109,14 @@ class NewEggCrawlHandler(crawle.Handler):
             raise 'Unknown Type'
 
     def process(self, rr, queue):
-        if rr.responseStatus == None and rr.responseMsg == 'Socket Error':
-            queue.put(rr.requestURL)
+        if rr.responseStatus == None:
+            try:
+                if rr.responseMsg == 'Socket Error':
+                    queue.put(rr.requestURL)
+                else:
+                    print rr.requestURL, rr.resposeMsg
+            except:
+                print rr.requestURL
             return
         elif rr.responseStatus != 200:
             self.handle_error(rr)
