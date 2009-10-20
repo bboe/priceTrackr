@@ -111,9 +111,9 @@ class NewEggCrawlHandler(crawle.Handler):
     def process(self, rr, queue):
         if rr.responseStatus == None:
             try:
-                if rr.responseMsg == 'Socket Error':
+                if rr.errorMsg == 'Socket Error':
                     queue.put(rr.requestURL)
-                elif rr.responseMsg == 'Redirect count exceeded':
+                elif rr.errorMsg == 'Redirect count exceeded':
                     pass
                 else:
                     self.handle_error(rr)
