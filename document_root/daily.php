@@ -28,7 +28,7 @@ if ($data = $Cache_Lite->get($id)) {
 <h1>Daily Drops</h1>
 
 <?php
-dailyDrops();
+   //dailyDrops();
 require_once 'includes/footer.php';
 $data = ob_get_flush();
 $Cache_Lite->save($data);

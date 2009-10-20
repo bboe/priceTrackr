@@ -25,7 +25,7 @@ if ($data = $Cache_Lite->get($id)) {
 
 	print '<h1>Frequently Asked Questions</h1>';
 
-	$result = $db->query('select id,date_modified,question,answer from faq order by date_modified');
+	$result = $db->query('select id, question, answer from faq order by date_added');
 
 	$count = 0;
 	print '<ol>';

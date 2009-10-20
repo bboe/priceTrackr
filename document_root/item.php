@@ -17,7 +17,7 @@ $options = array(
 $Cache_Lite = new Cache_Lite($options);
 
 // Test if there is a valide cache for this id
-if ($data = $Cache_Lite->get($id)) {
+if (false && $data = $Cache_Lite->get($id)) {
 	print $data;
 	print "\n".'<!--priceTrackr :)-->';
 } else { // No valid cache found (you have to make the page)
@@ -32,8 +32,8 @@ if ($data = $Cache_Lite->get($id)) {
 		
 		$url = 'http://www.newegg.com/Product/Product.asp?Item=';
 		$colors = array('#CCC','#999');
-		print '<div class="itemName"><h4><a href="'.$url.$id.'" onClick="javascript:urchinTracker(\'/outgoing/newegg.com/'.$id.'\');">'.$result[0]['name'].'</a></h4>
-		<p>Model Number: '.$result[0]['model_num'].'</p></div>';
+		print '<div class="itemName"><h4><a href="'.$url.$_GET['item'].'" onClick="javascript:urchinTracker(\'/outgoing/newegg.com/'.$_GET['item'].'\');">'.$result[0]['title'].'</a></h4>
+		<p>Model Number: '.$result[0]['model'].'</p></div>';
 
 		?>
 		<div class="itemAdd">
@@ -57,54 +57,59 @@ if ($data = $Cache_Lite->get($id)) {
 		
 		<?php		
 		// Check to make sure the item wasn't added today		
-		if (!($result[0]['s_date'] == date('Y-m-d'))) {
+		if (!($result[0]['update_date'] == date('Y-m-d'))) {
 			require_once 'includes/chart/charts.php';
-			echo InsertChart ('/static_content/scripts/charts.swf', '/static_content/charts_library', '/g/'.$_GET['item'],500,250,'C8E9FF',true);
+			echo InsertChart('/static_content/scripts/charts.swf', '/static_content/charts_library', '/g/'.$_GET['item'],500,250,'C8E9FF',true);
 		}
 		else print '<p class="mesg">This item was added within the last 24 hours and therefore no chart will be displayed.</p>';
 
 		$value = end($result);
-		$currO = $value['orig']+$value['shipping'];
-		$currS = $value['cost']+$value['shipping'];
-		if ($value['after_rebate'] != 0) $currR = $value['after_rebate']+$value['shipping'];
-		else $currR = $currS;
+		$original = $value['original'];
+		$price = $value['price'];
+		$rebate = $value['rebate'];
+		$shipping = $value['shipping'];
 
-		$maxO = $maxS = $maxR = 0;
-		$minO = $minS = $minR = 0x7FFFFF;
+		$max_original = $max_price = $max_rebate = $max_shipping = 0;
+		$min_original = $min_price = $min_rebate = $min_shipping = 0x7FFFFF;
 
+		$date_min_shipping = NULL;
+		
 		foreach ($result as $value) {
-			$cPrice = $value['orig']+$value['shipping'];
-			$cSavings = $value['cost']+$value['shipping'];
-			if ($value['after_rebate'] != 0) $cRebate = $value['after_rebate']+$value['shipping'];
-			else $cRebate = $cSavings;
+		  if ($value['original'] > $max_original) {
+		    $max_original = $value['original'];
+		    $date_max_original = $value['update_date'];
+		  }
+		  if ($value['price'] > $max_price) {
+		    $max_price = $value['price'];
+		    $date_max_price = $value['update_date'];
+		  }
+		  if ($value['rebate'] > $max_rebate) {
+		    $max_rebate = $value['rebate'];
+		    $date_max_rebate = $value['update_date'];
+		  }
+		  if ($value['shipping'] > $max_shipping) {
+		    $max_shipping = $value['shipping'];
+		    $date_max_shipping = $value['update_date'];
+		  }
 
-			if ($cPrice > $maxO) {
-				$maxO = $cPrice;
-				$dateMaxO = $value['s_date'];
-			}
-			if ($cSavings > $maxS) {
-				$maxS = $cSavings;
-				$dateMaxS = $value['s_date'];
-			}
-			if ($cRebate > $maxR) {
-				$maxR = $cRebate;
-				$dateMaxR = $value['s_date'];
-			}
-
-			if ($cPrice < $minO) {
-				$minO = $cPrice;
-				$dateMinO = $value['s_date'];
-			}
-			if ($cSavings < $minS) {
-				$minS = $cSavings;
-				$dateMinS = $value['s_date'];
-			}
-			if ($cRebate < $minR) {
-				$minR = $cRebate;
-				$dateMinR = $value['s_date'];
-			}
+		  if ($value['original'] < $min_original) {
+		    $min_original = $value['original'];
+		    $date_min_original = $value['update_date'];
+		  }
+		  if ($value['price'] < $min_price) {
+		    $min_price = $value['price'];
+		    $date_min_price = $value['update_date'];
+		  }
+		  if ($value['rebate'] < $min_rebate) {
+		    $min_rebate = $value['rebate'];
+		    $date_min_rebate = $value['update_date'];
+		  }
+		  if ($value['shipping'] < $min_shipping && $value['shipping'] != 0) {
+		    $min_shipping = $value['shipping'];
+		    $date_min_shipping = $value['update_date'];
+		  }
 		}
-
+		  
 		print '<h3>Statistics</h3>';
 		print '<table class="stats">';
 		print '<tr>';
@@ -114,27 +119,37 @@ if ($data = $Cache_Lite->get($id)) {
 		print '<th><h3>Maximum</h3></th>';
 		print '</tr>';
 		print '<tr>';
-		print '<td>cost + shipping</td>';
-		print '<td>' . intToDollar($currO).'</td>';
-		print '<td><span class="min">' . intToDollar($minO) . '</span> on ' . $dateMinO .'</td>';
-		print '<td><span class="max">' . intToDollar($maxO) . '</span> on ' . $dateMaxO .'</td>';
+		print '<td>original</td>';
+		print '<td>' . intToDollar($original).'</td>';
+		print '<td><span class="min">' . intToDollar($min_original) . '</span> on ' . $date_min_original .'</td>';
+		print '<td><span class="max">' . intToDollar($max_original) . '</span> on ' . $date_max_original .'</td>';
 		print '</tr>';
 		print '<tr>';
 		print '<td>+ savings</td>';
-		print '<td>' . intToDollar($currS).'</td>';
-		print '<td><span class="min">' . intToDollar($minS) . '</span> on ' . $dateMinS .'</td>';
-		print '<td><span class="max">' . intToDollar($maxS) . '</span> on ' . $dateMaxS .'</td>';
+		print '<td>' . intToDollar($price).'</td>';
+		print '<td><span class="min">' . intToDollar($min_price) . '</span> on ' . $date_min_price .'</td>';
+		print '<td><span class="max">' . intToDollar($max_price) . '</span> on ' . $date_max_price .'</td>';
 		print '</tr>';
 		print '<tr>';
 		print '<td>+ rebate</td>';
-		print '<td>' . intToDollar($currR).'</td>';
-		print '<td><span class="min">' . intToDollar($minR) . '</span> on ' . $dateMinR .'</td>';
-		print '<td><span class="max">' . intToDollar($maxR) . '</span> on ' . $dateMaxR .'</td>';
+		print '<td>' . intToDollar($rebate).'</td>';
+		print '<td><span class="min">' . intToDollar($min_rebate) . '</span> on ' . $date_min_rebate .'</td>';
+		print '<td><span class="max">' . intToDollar($max_rebate) . '</span> on ' . $date_max_rebate .'</td>';
+		print '</tr>';
+		print '<tr>';
+		print '<td>shipping*</td>';
+		print '<td>' . intToDollar($shipping).'</td>';
+		if ($date_min_shipping == NULL) {
+		  print '<td colspan=2><strong>Always Free Shipping</strong></td>';
+		}
+		else {
+		  print '<td><span class="min">' . intToDollar($min_shipping) . '</span> on ' . $date_min_shipping .'*</td>';
+		  print '<td><span class="max">' . intToDollar($max_shipping) . '</span> on ' . $date_max_shipping .'</td>';
+		}
 		print '</tr>';
 		print '</table>';
-		require_once 'includes/title.php';
-
-	}
+		print '<p>* Shipping is calculated to zip code 93117. Minimum shipping is the lowest nonzero shipping cost.</p>';
+		}
 	elseif (isset($_GET['item']) && $_GET['item']) {
 		print 'This item has recently been added and currently has no data. Data will be added for this item within a day.';
 	}

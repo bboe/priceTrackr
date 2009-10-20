@@ -39,25 +39,10 @@ if ($data = $Cache_Lite->get($id)) {
 <p>2009-10-15 - priceTrackr is back!</p>
 <p>2007-01-21 - So priceTrackr probably wont be coming back up as I cannot afford a dedicated server and the tracking scripts "utilize too many resources" which is complete BS. As the whole purpose of this website was to aid in making purchases I offer the following link. <a href="http://labs.anandtech.com/">labs.anandtech.com</a>.</p>
 <p>2007-01-06 - As some of you may have noticed priceTrackr was down for roughly a day due to my update scripts running and as I was told utilizing too much of the server's resources. Anyways this means my update scripts are not currently running, though I should have a work around for this current situation soon.
-<h2>Latest Updates</h2>
 
 <?php
-recentAdded();
-
 require_once 'includes/footer.php';
 $data = ob_get_flush();
 $Cache_Lite->save($data);
-}
-
-function recentAdded() {
-	global $db;
-	$result = $db->query('SELECT small_name,id,current_price from item,tracker where tracker.item_id = id order by date desc limit 10');
-	$count = 0;
-	print '<div class="results"><ol>';
-	foreach ($result as $value) {
-		print '<li><a href="/i/'.$value['id'].'/">'.$value['small_name'].'</a> - <span class="price">'.intToDollar($value['current_price']).'</span></li>';
-		$count++;
-	}
-	print '</ol></div>';
 }
 ?>

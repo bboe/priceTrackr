@@ -19,30 +19,21 @@ $options = array(
 $Cache_Lite = new Cache_Lite($options);
 
 // Test if thereis a valide cache for this id
-if ($data = $Cache_Lite->get($cacheID)) {
+if (false && $data = $Cache_Lite->get($cacheID)) {
 	print $data;
 } else { // No valid cache found (you have to make the page)
 	ob_start();
 	define('START', true);
+	define('ERROR_SET', true);
+	require_once('includes/functions.php');
 	require_once 'includes/myDB.php';
 	require_once 'includes/chart/charts.php';
 
-	$id = $_GET['item'];
-
+	$id = id_to_num($_GET['item']);
 	$db = new myDB();
 
-	$oneMonth = date('Y-m-d',strtotime('-1 month'));
-	$result = $db->prepare_execute('select date(date_added) as date from item where id = ?',$id,'text',true,false);
-	$dateAdded = $result[0]['date'];
-
-	if ($oneMonth < $dateAdded) {
-		$result =& oneMonthQuery($db,$id);
-		$skip = 5;
-	}
-	else {
-		$result =& allTimeQuery($db,$id);
-		$skip = ceil((time() - strtotime($dateAdded))/86400/12);
-	}
+	$result =& allTimeQuery($db, $id);
+	$skip = 5;
 	$db->free();
 
 	/*
@@ -70,7 +61,7 @@ if ($data = $Cache_Lite->get($cacheID)) {
 }
 
 function allTimeQuery(&$db,$id) {
-  $result = $db->prepare_execute('select date(date) as date,orig,cost,after_rebate,shipping from tracker where item_id = ? order by date',$id,'text',true,false);
+  $result = $db->prepare_execute('select date(date_added) as date, original, price, rebate, shipping from item_history where id = ? order by date', $id, 'text', true, false);
   return $result;
 }
 
