@@ -54,12 +54,32 @@ if (false && $data = $Cache_Lite->get($id)) {
 		src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 		</script>
 		</div>
-		
 		<?php		
 		// Check to make sure the item wasn't added today		
-		if (!($result[0]['update_date'] == date('Y-m-d'))) {
-			require_once 'includes/chart/charts.php';
-			echo InsertChart('/static_content/scripts/charts.swf', '/static_content/charts_library', '/g/'.$_GET['item'],500,250,'C8E9FF',true);
+		   if (!($result[0]['update_date'] == date('Y-m-d'))) {?>
+		<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" 
+			WIDTH="400" 
+			HEIGHT="250" 
+			id="charts">
+		  <PARAM NAME="movie" VALUE="/static_content/charts.swf?library_path=/static_content/charts_library&xml_source=/g/<?=$_GET['item']?>" />
+		  <PARAM NAME="quality" VALUE="high" />
+		  <PARAM NAME="bgcolor" VALUE="#666666" />
+		  <param name="allowScriptAccess" value="sameDomain" />
+		  
+		  <EMBED src="/static_content/charts.swf?library_path=/static_content/charts_library&xml_source=/g/<?=$_GET['item']?>"
+			 quality="high" 
+			 bgcolor="#C8E9FF" 
+			 WIDTH="500" 
+			 HEIGHT="250" 
+			 NAME="charts" 
+			 allowScriptAccess="sameDomain" 
+			 swLiveConnect="true" 
+			 TYPE="application/x-shockwave-flash" 
+			 PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+		  </EMBED>
+		</OBJECT>
+                <?php
 		}
 		else print '<p class="mesg">This item was added within the last 24 hours and therefore no chart will be displayed.</p>';
 

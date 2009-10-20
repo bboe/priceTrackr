@@ -3,7 +3,6 @@ if(!(defined('START') && START)) exit('Not A Valid Entry Point');
 
 if (isset($_GET['item']) && $_GET['item'] != '') {
   $id = id_to_num($_GET['item']);
-  print $id;
   if (!$id) {
     print 'Invalid Item';
     unset($_GET);
