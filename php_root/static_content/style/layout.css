@@ -1,0 +1,37 @@
+body{padding:5px;background:#3B6480;color:#222;text-align:center;font:85% "Trebuchet MS",Arial,sans-serif}
+h1,h2,h3,h4{margin:0;padding:0 10px;font-weight:normal}
+h1{font-size:250%;font-family:impact,sans-serif;letter-spacing:0}
+h2{font-size:180%}
+h3{font-size:150%}
+h4{font-size:120%}
+p{font-size:100%;margin:0 10px 10px 20px;}
+div#container{width:700px !important; width /**/:710px;
+    margin: 0 auto;padding:5px;text-align:left;background:#FFF}
+div#header{background:#91D3FF url(../images/gradient.png) repeat-x 0 -5px;padding:0;width:700px}
+div#header h1{font-size:300%;color:#FFF}
+div#content{float:left;width:550px;padding:10px 0;margin:5px 0;background:#C8E9FF}
+div#adds{float:right;width:145px;background:#FFA191;padding:10px 0;margin:5px 0;text-align:center}
+div#adds h2{font-size:150%;font-family:impact,sans-serif;letter-spacing:0}
+div#footer{clear:both;background:#91D3FF url(../images/gradient.png) repeat-x 0 -5px;padding:5px 0;text-align:center}
+ul#nav,ul#nav li{list-style-type:none;margin:0;padding:0}
+ul#nav{margin-left:5px}
+ul#nav li{float:left;margin-right:3px;text-align:center}
+ul#nav a{float:left;width:6em;padding:5px 0;background:#FFD991;text-decoration:none;color:#666}
+ul#nav a:hover{background:#FFA191;color:#FFF}
+ul#nav a.active{background:#75C8FF;color:#FFF}
+ul#nav li.activelink a,ul#nav li.activelink a:hover{background:#FFF;color:#003}
+div#content h1{margin:0 10px 10px 10px;background:#4E85AA;color:#FFD991}
+div#content a{color:#3B6480;text-decoration:none;font-weight:bold}
+div#content a:hover{text-decoration:underline}
+div.faq{margin-bottom:10px}
+.small{font-size:70%}
+.mesg{color:#F00;margin:0 10px 0 20px;font-size:80%}
+.itemName h4{font-family:"Trebuchet MS",Arial,sans-serif}
+.itemName p{margin-left:10px}
+table.stats{margin:10px;width:100%;text-align:center;font-size:95%}
+.min{color:#00F}
+.max{color:#F00}
+div#content .results li{padding-bottom:10px}
+div#content .results a{font-weight:normal}
+div#content .results .price{font-weight:bold}
+.itemAdd{text-align:center;padding-bottom:10px}
