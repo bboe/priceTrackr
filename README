@@ -1,9 +1,0 @@
-2008-07-09
-- Fixed query calls with ? to use the new function prepare_execute
-- Search, add, and graphing now works. RSS feed not tested.
-
-2008-07-07
-
-- Requires php-pear
-  - Requires pear package cache_lite, MDB2, and MDB2#mysqli
-
