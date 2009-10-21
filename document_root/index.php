@@ -6,7 +6,7 @@ $id = 'index';
 // Set a few options
 $options = array(
 'cacheDir' => '/tmp/',
-'lifeTime' => 300
+'lifeTime' => 60*60*24
 );
 
 // Create a Cache_Lite object
