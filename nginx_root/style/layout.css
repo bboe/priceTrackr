@@ -7,12 +7,12 @@ h4{font-size:120%}
 p{font-size:100%;margin:0 10px 10px 20px;}
 div#container{width:700px !important; width /**/:710px;
     margin: 0 auto;padding:5px;text-align:left;background:#FFF}
-div#header{background:#91D3FF url(../images/gradient.png) repeat-x 0 -5px;padding:0;width:700px}
+div#header{background:#91D3FF url(/images/gradient.png) repeat-x 0 -5px;padding:0;width:700px}
 div#header h1{font-size:300%;color:#FFF}
 div#content{float:left;width:550px;padding:10px 0;margin:5px 0;background:#C8E9FF}
 div#adds{float:right;width:145px;background:#FFA191;padding:10px 0;margin:5px 0;text-align:center}
 div#adds h2{font-size:150%;font-family:impact,sans-serif;letter-spacing:0}
-div#footer{clear:both;background:#91D3FF url(../images/gradient.png) repeat-x 0 -5px;padding:5px 0;text-align:center}
+div#footer{clear:both;background:#91D3FF url(/images/gradient.png) repeat-x 0 -5px;padding:5px 0;text-align:center}
 ul#nav,ul#nav li{list-style-type:none;margin:0;padding:0}
 ul#nav{margin-left:5px}
 ul#nav li{float:left;margin-right:3px;text-align:center}

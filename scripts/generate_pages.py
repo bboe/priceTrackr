@@ -83,8 +83,8 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <head>
 <title>%s &raquo; priceTrackr</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<link rel="stylesheet" type="text/css" href="/static_content/style/layout.css" />
-<script type="text/javascript" src="/static_content/scripts/niftycube.js"></script>
+<link rel="stylesheet" type="text/css" href="/style/layout.css" />
+<script type="text/javascript" src="/scripts/niftycube.js"></script>
 <script type="text/javascript">
 function searchInputClick() {
 input = document.getElementById('searchInput')
@@ -116,7 +116,7 @@ Nifty("ul#nav a","transparent bottom");
 <td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
 <div>
 <input type="text" name="q" id="searchInput" value="search..." size="20" maxlength="100" onfocus="searchInputClick();" onblur="searchInputBlur();" />
-<input type="image" alt="Submit" src="/static_content/images/search.png" style="vertical-align:middle" />
+<input type="image" alt="Submit" src="/images/search.png" style="vertical-align:middle" />
 </div>
 </form></td>
 
@@ -159,12 +159,12 @@ codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#ve
 WIDTH="400" 
 HEIGHT="250" 
 id="charts">
-  <PARAM NAME="movie" VALUE="/static_content/charts.swf?library_path=/static_content/charts_library&xml_source=/g/%s" />
+  <PARAM NAME="movie" VALUE="/charts.swf?library_path=/charts_library&xml_source=/g/%s" />
   <PARAM NAME="quality" VALUE="high" />
   <PARAM NAME="bgcolor" VALUE="#666666" />
   <param name="allowScriptAccess" value="sameDomain" />
   
-  <EMBED src="/static_content/charts.swf?library_path=/static_content/charts_library&xml_source=/g/%s"
+  <EMBED src="/charts.swf?library_path=/charts_library&xml_source=/g/%s"
  quality="high" 
  bgcolor="#C8E9FF" 
  WIDTH="500" 
@@ -330,5 +330,5 @@ if __name__ == '__main__':
     rows = cursor.fetchall()
     ids = [x['id'] for x in rows]
 
-    generate_graph_pages(cursor, ids, '../document_root/static_content/graphs')
-    generate_item_pages(cursor, ids, '../document_root/static_content/items')
+    generate_graph_pages(cursor, ids, '../nginx_root/graphs')
+    generate_item_pages(cursor, ids, '../nginx_root/items')
