@@ -27,13 +27,12 @@ if (false && $data = $Cache_Lite->get($cacheID)) {
 	define('ERROR_SET', true);
 	require_once('includes/functions.php');
 	require_once 'includes/myDB.php';
-	require_once 'includes/chart/charts.php';
 
 	$id = id_to_num($_GET['item']);
 	$db = new myDB();
 
-	$result =& allTimeQuery($db, $id);
-	$skip = 5;
+	$result = allTimeQuery($db, $id);
+	$skip = 0;
 	$db->free();
 
 	/*
@@ -44,7 +43,7 @@ if (false && $data = $Cache_Lite->get($cacheID)) {
 	$chart['chart_type'] = 'Line';
 	$chart['chart_value'] = array('prefix'=>'$','decimals'=>2,'separator'=>',','position'=>'cursor','size'=>14,'color'=>'000000','background_color'=>'FFD991','alpha'=>90);
 	$chart['chart_pref'] = array('line_thickness'=>2,'point_shape'=>'none');
-	$chart['chart_transition'] = array('type'=>'scale','delay'=>0,'duration'=>1,'order'=>'series');
+	$chart['chart_transition'] = array('type'=>'slide_down','delay'=>0,'duration'=>1,'order'=>'series');
 	$chart['legend_rect'] = array ('x'=>5,'y'=>5,'width'=>490);
 	$chart['legend_transition'] = array('type'=>'slide_right','delay'=>0,'duration'=>1);
 	$chart['axis_category'] = array('skip'=>$skip);
@@ -53,105 +52,64 @@ if (false && $data = $Cache_Lite->get($cacheID)) {
 	$chart['series_color'] = array('FFCF75','AA5C4E','4E85AA');
 	$chart['series_explode'] = array(250,175,100);
 
-	SendChartData ( $chart );
+	SendChartData($chart);
 
 	$data = ob_get_flush();
 	$Cache_Lite->save($data);
-
 }
 
-function allTimeQuery(&$db,$id) {
+function allTimeQuery($db,$id) {
   $result = $db->prepare_execute('select date(date_added) as date, original, price, rebate, shipping from item_history where id = ? order by date', $id, 'text', true, false);
   return $result;
 }
 
-function oneMonthQuery(&$db,$id) {
-  $result = $db->prepare_execute('select date(date) as date,orig,cost,after_rebate,shipping from tracker where item_id = ? and date > date_sub(now(),interval 1 month) order by date',$id,'text',true,false);
-  $result2 = $db->prepare_execute('select orig,cost,after_rebate,shipping from tracker where itemID = ? and date < date_sub(now(),interval 1 month) order by date desc limit 1',$id,'text',true,false);
-	$result['begin'] = date('Y-m-d',strtotime('-1 month'));
-	if (sizeof($result2)) {
-		$result['orig'] = $result2[0]['orig'];
-		$result['cost'] = $result2[0]['cost'];
-		$result['after_rebate'] = $result2[0]['after_rebate'];
-		$result['shipping'] = $result2[0]['shipping'];
-	}
-	return $result;
-}
-
 function buildData($info) {
-	define('ONE_DAY',60*60*24);
+  define('ONE_DAY',60*60*24);
+  $chart_data[0][0] = NULL;
+   
+  $chart_data[0][0] = NULL;
+  $chart_data[1][0] = 'original';
+  $chart_data[2][0] = '+ savings';
+  $chart_data[3][0] = '+ rebates';
+  $chart_data[4][0] = 'original + shipping';
 
-	// Set the start and end points
-	if (isset($info['begin'])) {
-		$currDate = strtotime($info['begin']);
-		unset($info['begin']);
-	}
-	else $currDate = strtotime($info[0]['date']);
-	$endDate = time();
+  $max_axis = 0;
+  $min_axis = 0x7FFFFFFF;
 
-	// Get starting prices
-	if (isset($info['orig'])) {
-		$cPrice = ($info['orig']+$info['shipping'])/100.;
-		$cSavings = ($info['cost']+$info['shipping'])/100.;
-		if ($info['after_rebate'] != 0) $cRebate = ($info['after_rebate']+$info['shipping'])/100.;
-		else $cRebate = $cSavings;
-		$max = $cPrice;
-		$min = $cRebate;
-		unset($info['orig']);
-		unset($info['cost']);
-		unset($info['after_rebate']);
-		unset($info['shipping']);
-	}
-	else {
-		$cPrice = $cSavings = $cRebate = null;
-		$max = 0;
-		$min = 0x7FFF;
-	}
+  $index = 0;
+  $curr_date = strtotime($info[0]['date']);
+  $end_date = time();  
+  while($curr_date <= $end_date) {
+    $chart_data[0][] = date('m/d',$curr_date);
 
-	$index = 0;
-
-	// Create chart titles
-	$toReturn['chart_data'][0][0] = '';
-	$toReturn['chart_data'][1][0] = 'cost + shipping';
-	$toReturn['chart_data'][2][0] = '+ savings';
-	$toReturn['chart_data'][3][0] = '+ rebates';
-	
-	
-
-	// Iterate through each day
-	while($currDate <= $endDate) {
-		// Set the date for the item
-		$toReturn['chart_data'][0][] = date('m/d',$currDate);
-
-		// This will make sure we have the last price tracked durring the day.
-		// This might be better with an average over the day.
-		while (isset($info[$index]) && strtotime($info[$index]['date']) < ($currDate + ONE_DAY)) {
-			$temp = $info[$index];
-			$cPrice = ($temp['orig']+$temp['shipping'])/100.;
-			$cSavings = ($temp['cost']+$temp['shipping'])/100.;
-			if ($temp['after_rebate'] != 0) $cRebate = ($temp['after_rebate']+$temp['shipping'])/100.;
-			else $cRebate = $cSavings;
-
-			$index++;
-		}
+    // This will make sure we have the last price tracked durring the day.
+    while (isset($info[$index]) && strtotime($info[$index]['date']) < ($curr_date + ONE_DAY)) {
+      $temp = $info[$index];
+      $original = $temp['original'] / 100.;
+      $price = $temp['price'] / 100.;
+      $rebate = $temp['rebate'] / 100.;
+      $shipping = $original + $temp['shipping'] / 100.;
+      $index++;
+    }
 		
-		// Update the min and max if necessary
-		if (!is_null($cRebate) && $cRebate < $min) $min = $cRebate;
-		if ($cPrice > $max) $max = $cPrice;
+    if ($original > $max_axis) $max_axis = $original;
+    if ($shipping < $min_axis) $min_axis = $shipping;
 
-		// Add the prices to the chart
-		$toReturn['chart_data'][1][] = $cPrice;
-		$toReturn['chart_data'][2][] = $cSavings;
-		$toReturn['chart_data'][3][] = $cRebate;
+    // Add the prices to the chart
+    $chart_data[1][] = $original;
+    $chart_data[2][] = $price;
+    $chart_data[3][] = $rebate;
+    $chart_data[4][] = $shipping;
 
-		// Increment to the next day
-		$currDate += ONE_DAY;
-	}
+    // Increment to the next day
+    $curr_date += ONE_DAY;
+  }
 
-	// Setup min and max values
-	$toReturn['axis_value']['min'] = $min*.95;
-	$toReturn['axis_value']['max'] = $max*1.05;
+  // Setup min and max values
+  $toReturn['axis_value']['min'] = $min_axis * .99;
+  $toReturn['axis_value']['max'] = $max_axis * 1.01;
+  $toReturn['chart_data'] = $chart_data;
 
-	return $toReturn;
+  return $toReturn;
 }
 ?>

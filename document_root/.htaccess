@@ -1,6 +1,6 @@
 RewriteEngine On
 RewriteRule ^g/?$ / [R]
-RewriteRule ^g/([A-Z0-9]+)/?$ graph.php?item=$1 [L]
+RewriteRule ^g/([A-Z0-9]+)/?$ static_content/graphs/$1.html [L]
 RewriteRule ^i/?$ / [R]
 RewriteRule ^i/([A-Za-z0-9-]+)/?$ item.php?item=$1 [L]
 RewriteRule ^r/?$ / [R]
