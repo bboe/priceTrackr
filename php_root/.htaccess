@@ -1,10 +1,4 @@
 RewriteEngine On
-RewriteRule ^g/?$ / [R]
-RewriteRule ^g/([A-Z0-9]+)/?$ static_content/graphs/$1.html [L]
-RewriteRule ^i/?$ / [R]
-RewriteRule ^i/([A-Za-z0-9-]+)/?$ static_content/items/$1.html [L]
-RewriteRule ^r/?$ / [R]
-RewriteRule ^r/([A-Za-z0-9-]+)/?$ rss.php?feed=$1 [L]
 RewriteRule ^all/$ all.php [L]
 RewriteRule ^contact/$ contact_form.php [L]
 RewriteRule ^daily/$ daily.php [L]

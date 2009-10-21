@@ -14,8 +14,8 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <head>
 <title>priceTrackr - <?php require_once 'title.php'?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<link rel="stylesheet" type="text/css" href="/static_content/style/layout.css" />
-<script type="text/javascript" src="/static_content/scripts/niftycube.js"></script>
+<link rel="stylesheet" type="text/css" href="/style/layout.css" />
+<script type="text/javascript" src="/scripts/niftycube.js"></script>
 <script type="text/javascript">
 function searchInputClick() {
 	input = document.getElementById('searchInput')
@@ -46,7 +46,7 @@ Nifty("ul#nav a","transparent bottom");
 <td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
 	<div>
 	<input type="text" name="q" id="searchInput" value="search..." size="20" maxlength="100" onfocus="searchInputClick();" onblur="searchInputBlur();" />
-	<input type="image" alt="Submit" src="/static_content/images/search.png" style="vertical-align:middle" />
+	<input type="image" alt="Submit" src="/images/search.png" style="vertical-align:middle" />
 	</div>
 </form></td>
 </tr>
