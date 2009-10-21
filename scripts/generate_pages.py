@@ -1,30 +1,15 @@
 #!/usr/bin/env python
-import math, os, sys, datetime
+import math, os, sys
 import MySQLdb
 
-
-
-    # def add_item(self, db, date):
-    #     db.execute(''.join(['insert into item (id, newegg_id, date_added, ',
-    #                         'title, model) VALUES (%s, %s, %s, %s, %s)']),
-    #                (self.to_num(), self.id, date, self.title, self.model))
-
-    # def update_history(self, db, date):
-    #     db.execute(''.join(['insert into item_history (id, date_added, ',
-    #                         'original, price, rebate, shipping) VALUES',
-    #                         '(%s, %s, %s, %s, %s, %s)']),
-    #                (self.to_num(), date, self.original, self.price,
-    #                 self.rebate, self.shipping))
-
-def generate_graph_pages(db, ids):
+def generate_graph_pages(db, ids, directory):
     end_xml_data = """  <license>K1XUXQVMDNCL.NS5T4Q79KLYCK07EK</license>
   <chart_type>Line</chart_type>
   <chart_value prefix="$" decimals="2" separator="," position="cursor" size="14" color="000000" background_color="FFD991" alpha="90" />
   <chart_pref line_thickness="2" point_shape="none" />
   <chart_transition type="slide_down" delay="0" duration="1" order="series" />
   <legend_rect x="5" y="5" width="490" />
-  <legend_transition type="slide_right" delay="0" duration="1" />
-  <axis_category skip="0" />
+  <legend_transition type="slide_right" />
   <series_color>
     <value>FFCF75</value>
     <value>AA5C4E</value>
@@ -37,7 +22,10 @@ def generate_graph_pages(db, ids):
   </series_explode>
 </chart>
 """
-    os.mkdir('graphs')
+    try:
+        os.mkdir(directory)
+    except OSError:
+        pass
     for id in ids:
         db.execute(''.join(['SELECT date_added as date, original',
                             ', price, rebate, shipping from item_',
@@ -61,8 +49,8 @@ def generate_graph_pages(db, ids):
                 prev_date = row['date'].date()
             else:
                 data[-1] = tmp
-            if tmp[1] > max_axis: max_axis = tmp[1]
-            if tmp[4] < min_axis: min_axis = tmp[4]
+            if tmp[1] < min_axis: min_axis = tmp[1]
+            if tmp[4] > max_axis: max_axis = tmp[4]
 
         output = ''.join(['<chart>\n  <axis_value min="%d" max="%d" ',
                           'steps="%d" prefix="$" />\n  <chart_data>\n']) % \
@@ -83,12 +71,244 @@ def generate_graph_pages(db, ids):
                     output += '      <number>%.2f</number>\n' % row[i]
             output += '    </row>\n'
         output += '  </chart_data>\n%s' % end_xml_data
-        file = open(os.path.join('graphs', '%s.html' % reverse_id(id)), 'w')
+        file = open(os.path.join(directory, '%s.html' % reverse_id(id)), 'w')
         file.write(output)
         file.close()
 
-def generate_item_pages(db, ids):
-    pass
+def generate_item_pages(db, ids, directory):
+    title_template = """<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>%s &raquo; priceTrackr</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" type="text/css" href="/static_content/style/layout.css" />
+<script type="text/javascript" src="/static_content/scripts/niftycube.js"></script>
+<script type="text/javascript">
+function searchInputClick() {
+input = document.getElementById('searchInput')
+if (input.value == 'search...') input.value = ''
+}
+
+function searchInputBlur() {
+input = document.getElementById('searchInput')
+if (input.value == '') input.value = 'search...'
+}
+</script>
+<script type="text/javascript">
+window.onload=function() {
+Nifty("div#container");
+Nifty("div#adds,div#content","same-height");
+Nifty("div#header,div#footer,div#content h1","transparent");
+Nifty("ul#nav a","transparent bottom");
+}
+</script>
+</head>
+<body>
+
+<div id="container">
+<div id="header">
+<table style="width:99%%">
+<!-- How can I do this without a table? -->
+<tr valign="bottom">
+<td><h1>priceTrackr</h1></td>
+<td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
+<div>
+<input type="text" name="q" id="searchInput" value="search..." size="20" maxlength="100" onfocus="searchInputClick();" onblur="searchInputBlur();" />
+<input type="image" alt="Submit" src="/static_content/images/search.png" style="vertical-align:middle" />
+</div>
+</form></td>
+
+</tr>
+</table>
+</div>
+<div id="menu">
+    <ul id="nav">
+        <li><a href="/">Home</a></li>
+    <li><a href="/faq/">FAQ</a></li>
+    <li><a href="/contact/">Contact</a></li>
+    <li><a href="/about/">About</a></li>
+    </ul>
+</div>
+"""
+    body_template = """<div id="content">
+<div class="itemName"><h4><a href="http://www.newegg.com/Product/Product.asp?Item=%s" onClick="javascript:urchinTracker('/outgoing/newegg.com/%s');">%s</a></h4>
+<p>Model: %s</p></div>
+<div class="itemAdd">
+<script type="text/javascript"><!--
+google_ad_client = "pub-0638295794514727";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+google_ad_channel ="0017611932";
+google_color_border = "C8E9FF";
+google_color_bg = "C8E9FF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "FF0000";
+//--></script>
+
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" 
+WIDTH="400" 
+HEIGHT="250" 
+id="charts">
+  <PARAM NAME="movie" VALUE="/static_content/charts.swf?library_path=/static_content/charts_library&xml_source=/g/%s" />
+  <PARAM NAME="quality" VALUE="high" />
+  <PARAM NAME="bgcolor" VALUE="#666666" />
+  <param name="allowScriptAccess" value="sameDomain" />
+  
+  <EMBED src="/static_content/charts.swf?library_path=/static_content/charts_library&xml_source=/g/%s"
+ quality="high" 
+ bgcolor="#C8E9FF" 
+ WIDTH="500" 
+ HEIGHT="250" 
+ NAME="charts" 
+ allowScriptAccess="sameDomain" 
+ swLiveConnect="true" 
+ TYPE="application/x-shockwave-flash" 
+ PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+
+  </EMBED>
+</OBJECT>
+"""
+    stats_template = """<h3>Statistics</h3>
+<table class="stats">
+  <tr>
+    <th><h3>Prices</h3></th>
+    <th><h3>Current</h3></th>
+    <th><h3>Minimum</h3></th>
+    <th><h3>Maximum</h3></th>
+  </tr>
+  <tr>
+    <td>original</td>
+    <td>$%.2f</td>
+    <td><span class="min">$%.2f</span> on %s</td>
+    <td><span class="max">$%.2f</span> on %s</td>
+  </tr>
+  <tr>
+    <td>+ savings</td><td>$%.2f</td>
+    <td><span class="min">$%.2f</span> on %s</td>
+    <td><span class="max">$%.2f</span> on %s</td>
+  </tr>
+  <tr>
+    <td>+ rebate</td><td>$%.2f</td>
+    <td><span class="min">$%.2f</span> on %s</td>
+    <td><span class="max">$%.2f</span> on %s</td>
+  </tr>
+  <tr>
+    <td>shipping*</td>
+    <td>%s</td>
+    %s
+  </tr>
+</table>
+<p>* Shipping is calculated to zip code 93117. Minimum shipping is the lowest nonzero shipping cost.</p></div>
+
+<div id="adds">
+<h2>Advertisements</h2>
+<br/>
+<br/>
+<script type="text/javascript"><!--
+google_ad_client = "pub-0638295794514727";
+google_ad_width = 120;
+google_ad_height = 240;
+google_ad_format = "120x240_as";
+google_ad_type = "text_image";
+google_ad_channel ="6355930926";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+<div id="footer">
+<div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
+</div>
+</div>
+
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-510348-5";
+urchinTracker();
+</script>
+</body>
+</html>"""
+
+    try:
+        os.mkdir(directory)
+    except OSError:
+        pass
+    for id in ids:
+        newegg_id = reverse_id(id)
+        db.execute(''.join(['SELECT title, model, item_history.date_added ',
+                            'as update_date, item_history.original, ',
+                            'item_history.price, item_history.rebate, ',
+                            'item_history.shipping from item, item_history ',
+                            'where item_history.id = item.id and item.id = ',
+                            '%s order by update_date']), id)
+        rows = cursor.fetchall()
+        current = rows[-1]
+
+        keys = ['original', 'price', 'rebate', 'shipping']
+        max = {}
+        min = {}
+        for key in keys:
+            max[key] = 0, None
+            min[key] = 0x7FFFFFFF, None
+        for row in rows:
+            for key in keys:
+                if row[key] > max[key][0]:
+                    max[key] = row[key], row['update_date'].date()
+                if key != 'shipping' and row[key] < min[key][0]:
+                    min[key] = row[key], row['update_date'].date()
+                elif key == 'shipping' and row[key] < min[key][0] and \
+                        row[key] != 0:
+                    min[key] = row[key], row['update_date'].date()
+
+        output = title_template % current['title']
+        output +=  body_template % (newegg_id, newegg_id, current['title'],
+                                    current['model'], newegg_id, newegg_id)
+        if min['shipping'][1]:
+            shipping = """<td><span class="min">$%.2f</span> on %s*</td>
+    <td><span class="max">$%.2f</span> on %s</td>""" % \
+                (min['shipping'][0] / 100., min['shipping'][1],
+                 max['shipping'][0] / 100., min['shipping'][1])
+        else:
+            shipping = "<td colspan=2><strong>Always Free Shipping</strong></td>"
+
+        output += stats_template % (current['original'] / 100.,
+                                    min['original'][0] / 100.,
+                                    min['original'][1],
+                                    max['original'][0] / 100.,
+                                    max['original'][1],
+                                    current['price'] / 100.,
+                                    min['price'][0] / 100.,
+                                    min['price'][1],
+                                    max['price'][0] / 100.,
+                                    max['price'][1],
+                                    current['rebate'] / 100.,
+                                    min['rebate'][0] / 100.,
+                                    min['rebate'][1],
+                                    max['rebate'][0] / 100.,
+                                    max['rebate'][1],
+                                    current['shipping'] / 100.,
+                                    shipping)
+
+        file = open(os.path.join(directory, '%s.html' % reverse_id(id)), 'w')
+        file.write(output)
+        file.close()
     
 
 def reverse_id(id):
@@ -110,5 +330,5 @@ if __name__ == '__main__':
     rows = cursor.fetchall()
     ids = [x['id'] for x in rows]
 
-    generate_graph_pages(cursor, ids)
-    generate_item_pages(cursor, ids)
+    generate_graph_pages(cursor, ids, '../document_root/static_content/graphs')
+    generate_item_pages(cursor, ids, '../document_root/static_content/items')
