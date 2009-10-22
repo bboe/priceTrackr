@@ -36,9 +36,9 @@ server {
 	#}
 	# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
 	#
-	#location ~ \.php$ {
-	#	include fastcgi_params;
-	#	fastcgi_param  SCRIPT_FILENAME  /home/bryce/src/priceTrackr/php_root/$fastcgi_script_name;
-	#	fastcgi_pass   127.0.0.1:9000;
-	#}
+	location ~ \.php$ {
+		include /etc/nginx/fastcgi_params;
+		fastcgi_param  SCRIPT_FILENAME  /home/bryce/src/priceTrackr/php_root/$fastcgi_script_name;
+		fastcgi_pass   127.0.0.1:9000;
+	}
 }
