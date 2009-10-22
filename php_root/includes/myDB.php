@@ -9,7 +9,7 @@ class myDB {
     if (defined('ERROR_SET') && ERROR_SET)
       PEAR::setErrorHandling (PEAR_ERROR_CALLBACK, 'pear_error_handler');
 
-    $dsn = 'mysqli://root@localhost/priceTrackr';
+    $dsn = 'mysqli://pt_user:pritshiz@localhost/priceTrackr';
     $options = array('debug' => 2, 'result_buffering' => false);
     $this->db =& MDB2::factory($dsn, $options);
     
