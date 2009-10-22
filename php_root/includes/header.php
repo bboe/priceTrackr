@@ -18,15 +18,10 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <link rel="stylesheet" type="text/css" href="/style/layout.css" />
 <script type="text/javascript" src="/scripts/niftycube.js"></script>
 <script type="text/javascript">
-function searchInputClick() {
-	input = document.getElementById('searchInput')
-	if (input.value == 'search...') input.value = ''
-}
-
-function searchInputBlur() {
-	input = document.getElementById('searchInput')
-	if (input.value == '') input.value = 'search...'
-}
+function searchInputClick(){input=document.getElementById('searchInput')
+if(input.value=='search...')input.value=''}
+function searchInputBlur(){input=document.getElementById('searchInput')
+if(input.value=='')input.value='search...'}
 </script>
 <script type="text/javascript">
 window.onload=function() {
