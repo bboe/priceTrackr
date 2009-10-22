@@ -13,10 +13,10 @@ if (isset($_GET['q'])) {
   $q = trim($_GET['q']);
   $len = strlen($q);
   if ($len == 0) print '<p class="error">No search terms entered.</p>';
-  else if ($len < 3) print '<p class="error">Search string too short.</p>';
+  else if ($len < 2) print '<p class="error">Search string too short.</p>';
   else if ($len > 100) print '<p class="error">Search string too long.</p>';
   else {
-	  $result = $db->prepare_execute('select newegg_id, title, match(title, model) against (? in boolean mode) as score from item where match(title, model) against (? in boolean mode) order by score desc', array($q, $q), array('text', 'text'), true, false);
+	  $result = $db->prepare_execute('select newegg_id, title, match(title, model) against (? in boolean mode) as score from item where match(title, model) against (? in boolean mode) order by score desc limit 30', array($q, $q), array('text', 'text'), true, false);
 	  $time = microtime(true)-$start;
 	  print '<p class="searchTime">'. $time . ' seconds</p>';
 	  print '<p class="query">Query:<i>'.$q.'</i></p>';

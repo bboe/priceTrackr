@@ -49,13 +49,13 @@ def generate_graph_pages(db, ids, directory):
                 prev_date = row['date'].date()
             else:
                 data[-1] = tmp
-            if tmp[1] < min_axis: min_axis = tmp[1]
+            if tmp[3] < min_axis: min_axis = tmp[3]
             if tmp[4] > max_axis: max_axis = tmp[4]
 
         output = ''.join(['<chart>\n  <axis_value min="%d" max="%d" ',
                           'steps="%d" prefix="$" />\n  <chart_data>\n']) % \
-                          (math.floor(min_axis * .99),
-                           math.ceil(max_axis * 1.01), 5)
+                          (math.floor(min_axis * .95),
+                           math.ceil(max_axis * 1.05), 5)
 
         for i, column in enumerate([None, 'original', '+ savings', '+ rebates',
                                     'original + shipping']):
@@ -66,7 +66,7 @@ def generate_graph_pages(db, ids, directory):
             output += '    <row>\n      %s\n' % title
             for row in data:
                 if i == 0:
-                    output += '      <string>%s</string>\n' % row[i]
+                    output += '      <string>%s</string>\n' % row[i].__str__()[2:]
                 else:
                     output += '      <number>%.2f</number>\n' % row[i]
             output += '    </row>\n'
