@@ -1,7 +1,0 @@
-RewriteEngine On
-RewriteRule ^all/$ all.php [L]
-RewriteRule ^contact/$ contact_form.php [L]
-RewriteRule ^daily/$ daily.php [L]
-RewriteRule ^error/$ error.php [L]
-RewriteRule ^faq/$ faq.php [L]
-RewriteRule ^search/$ search.php [L]
