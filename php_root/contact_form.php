@@ -21,25 +21,25 @@ if (isset($_POST) && sizeof($_POST) > 0) {
       $message = trim($_POST['message']);
       if ($from == '') {
 	$valid = false;
-	$msg .= '<p class="msg">Error: No from address</p>';
+	$msg .= '<p class="mesg">Error: No from address</p>';
       }
       else if (!validateEmail($from)) {
 	$valid = false;
-	$msg .= '<p class="msg">Error: Invalid email address</p>';
+	$msg .= '<p class="mesg">Error: Invalid email address</p>';
       }
       if ($subject == '') {
 	$valid = false;
-	$msg .= '<p class="msg">Error: No subject</p>';
+	$msg .= '<p class="mesg">Error: No subject</p>';
       }
       if ($message == '') {
 	$valid = false;
-	$msg .= '<p class="msg">Error: No message</p>';
+	$msg .= '<p class="mesg">Error: No message</p>';
       }
     }
     if ($valid) {
       $to = 'admin@pricetrackr.com';
       sendPearMail($to, $subject, $message, $from);
-      $msg .= '<p class="msg">Your message has been sent. Thank you.</p>';
+      $msg .= '<p class="mesg">Your message has been sent. Thank you.</p>';
     }
   }
   else {
