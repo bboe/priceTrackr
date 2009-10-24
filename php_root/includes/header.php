@@ -11,7 +11,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
-<title>priceTrackr - <?php require_once 'title.php'?></title>
+<title><?php require_once 'title.php'?> &raquo; priceTrackr</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="/style/layout.css" />
@@ -24,10 +24,10 @@ if(input.value=='')input.value='search...'}
 </script>
 <script type="text/javascript">
 window.onload=function() {
-Nifty("div#container");
-Nifty("div#adds,div#content","same-height");
-Nifty("div#header,div#footer,div#content h1","transparent");
-Nifty("ul#nav a","transparent bottom");
+Nifty("#container");
+Nifty("#adds,#content","same-height");
+Nifty("#header,#footer,#content h1","transparent");
+Nifty("#nav a","transparent bottom");
 }
 </script>
 </head>

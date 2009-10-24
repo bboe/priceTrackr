@@ -44,7 +44,6 @@ of California in Santa Barbara. Bryce has purchased the majority of his computer
 as their selection and speed of delivery cannot be matched.  Bryce hopes that through priceTrackr others
 may benefit by seeing trends in newegg's pricing and thus purchase items when they deem most appropriate.</p>
 <p>To learn more about the creator of priceTrackr please visit <a href="http://www.bryceboe.com">BryceBoe.com.</a></p>
-<p class="small">The use of "we" in the FAQ section is to give priceTrackr a more official feeling.</p>
 
 <?php
 require_once 'includes/footer.php';
