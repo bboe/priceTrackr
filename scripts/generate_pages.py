@@ -27,6 +27,8 @@ def generate_graph_pages(db, ids, directory):
     except OSError:
         pass
     for id in ids:
+        db.execute('select newegg_id from item where id = %s', id)
+        newegg_id = cursor.fetchone()['newegg_id']
         db.execute(''.join(['SELECT date_added as date, original',
                             ', price, rebate, shipping from item_',
                             'history where id = %s order by date']),
@@ -71,7 +73,7 @@ def generate_graph_pages(db, ids, directory):
                     output += '      <number>%.2f</number>\n' % row[i]
             output += '    </row>\n'
         output += '  </chart_data>\n%s' % end_xml_data
-        file = open(os.path.join(directory, '%s.html' % reverse_id(id)), 'w')
+        file = open(os.path.join(directory, '%s.html' % newegg_id), 'w')
         file.write(output)
         file.close()
 
@@ -237,15 +239,15 @@ urchinTracker();
     except OSError:
         pass
     for id in ids:
-        newegg_id = reverse_id(id)
         db.execute(''.join(['SELECT title, model, item_history.date_added ',
                             'as update_date, item_history.original, ',
                             'item_history.price, item_history.rebate, ',
-                            'item_history.shipping from item, item_history ',
-                            'where item_history.id = item.id and item.id = ',
-                            '%s order by update_date']), id)
+                            'item_history.shipping, newegg_id from item, ',
+                            'item_history where item_history.id = item.id ',
+                            'and item.id = %s order by update_date']), id)
         rows = cursor.fetchall()
         current = rows[-1]
+        newegg_id = current['newegg_id']
 
         keys = ['original', 'price', 'rebate', 'shipping']
         max = {}
@@ -292,7 +294,7 @@ urchinTracker();
                                     current['shipping'] / 100.,
                                     shipping)
 
-        file = open(os.path.join(directory, '%s.html' % reverse_id(id)), 'w')
+        file = open(os.path.join(directory, '%s.html' % newegg_id), 'w')
         file.write(output)
         file.close()
     
@@ -309,7 +311,7 @@ def reverse_id(id):
         return '%s%06dIN' % (root, id & (2 ** 28 - 1))
     
 if __name__ == '__main__':
-    conn = MySQLdb.connect(user='root', db='priceTrackr')
+    conn = MySQLdb.connect(user='pt_user', passwd='pritshiz', db='priceTrackr')
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
 
     count = cursor.execute('SELECT id from item')
