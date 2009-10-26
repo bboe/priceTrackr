@@ -87,22 +87,17 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <link rel="stylesheet" type="text/css" href="/style/layout.css" />
 <script type="text/javascript" src="/scripts/niftycube.js"></script>
 <script type="text/javascript">
-function searchInputClick() {
-input = document.getElementById('searchInput')
-if (input.value == 'search...') input.value = ''
-}
-
-function searchInputBlur() {
-input = document.getElementById('searchInput')
-if (input.value == '') input.value = 'search...'
-}
+function searchInputClick() {input = document.getElementById('searchInput')
+if (input.value == 'search...') input.value = ''}
+function searchInputBlur() {input = document.getElementById('searchInput')
+if (input.value == '') input.value = 'search...'}
 </script>
 <script type="text/javascript">
 window.onload=function() {
-Nifty("div#container");
-Nifty("div#adds,div#content","same-height");
-Nifty("div#header,div#footer,div#content h1","transparent");
-Nifty("ul#nav a","transparent bottom");
+Nifty("#container");
+Nifty("#adds,#content","same-height");
+Nifty("#header,#footer,#content h1","transparent");
+Nifty("#nav a","transparent bottom");
 }
 </script>
 </head>
@@ -216,17 +211,7 @@ id="charts">
 <br/>
 <br/>
 <script type="text/javascript"><!--
-google_ad_client = "pub-0638295794514727";
-google_ad_width = 120;
-google_ad_height = 240;
-google_ad_format = "120x240_as";
-google_ad_type = "text_image";
-google_ad_channel ="6355930926";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
+google_ad_client = "pub-0638295794514727";google_ad_width = 120;google_ad_height = 240;google_ad_format = "120x240_as";google_ad_type = "text_image";google_ad_channel ="6355930926";google_color_border = "336699";google_color_bg = "FFFFFF";google_color_link = "0000FF";google_color_text = "000000";google_color_url = "008000";
 //--></script>
 <script type="text/javascript"
   src="http://pagead2.googlesyndication.com/pagead/show_ads.js">

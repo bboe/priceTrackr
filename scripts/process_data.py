@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import cPickle, os, re, sys, time
+import cPickle, os, re, string, sys, time
 import MySQLdb
 
 class ItemHistoryHelper(object):
@@ -20,7 +20,8 @@ class ItemHistoryHelper(object):
             
     @staticmethod
     def convert_price(price):
-        return int(price.translate(None, '.,'))
+        trans = string.maketrans('', '')
+        return int(price.translate(trans, '.,'))
 
     def __init__(self, id, item):
         self.id = id
@@ -111,9 +112,11 @@ if __name__ == '__main__':
     except Exception, e:
         raise
 
+    file = os.path.basename(file)
     date = file.strip('.pkl').replace('.', ':').replace('_', ' ')
 
-    conn = MySQLdb.connect(user='root', db='priceTrackr')
+    conn = MySQLdb.connect(user='pt_user', passwd='pritshiz',
+                           db='priceTrackr')
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
     count = cursor.execute('SELECT newegg_id from item')
     rows = cursor.fetchall()
