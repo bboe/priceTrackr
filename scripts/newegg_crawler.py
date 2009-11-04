@@ -186,3 +186,7 @@ if __name__ == '__main__':
     output = open('%s.pkl' % output_prefix, 'w')
     cPickle.dump(crawler.handler.items, output, cPickle.HIGHEST_PROTOCOL)
     output.close()
+
+    if not os.system('tar -czf %s.tar.gz %s/' %
+                     (output_prefix, output_prefix)):
+        os.system('rm -rf %s/' % output_prefix)    

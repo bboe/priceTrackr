@@ -17,6 +17,7 @@ if __name__ == '__main__':
         id = fname.strip('.html')
         rr = cPickle.load(open(os.path.join(directory, fname)))
         print '%s: Status: %s Error: %s' % (id, rr.responseStatus, rr.errorMsg)
+        print rr.errorObject
 
 
 
