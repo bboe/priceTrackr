@@ -87,12 +87,12 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="/style/layout.css" />
-<script type="text/javascript" src="/scripts/niftycube.js"></script>
+<script type="text/javascript" src="/javascript.js"></script>
 <script type="text/javascript">
-function searchInputClick() {input = document.getElementById('searchInput')
-if (input.value == 'search...') input.value = ''}
-function searchInputBlur() {input = document.getElementById('searchInput')
-if (input.value == '') input.value = 'search...'}
+function searchInputClick(){input=document.getElementById('searchInput')
+if(input.value=='search...')input.value=''}
+function searchInputBlur(){input=document.getElementById('searchInput')
+if(input.value=='')input.value='search...'}
 </script>
 <script type="text/javascript">
 window.onload=function() {
@@ -104,7 +104,6 @@ Nifty("#nav a","transparent bottom");
 </script>
 </head>
 <body>
-
 <div id="container">
 <div id="header">
 <table style="width:99%%">
@@ -112,42 +111,35 @@ Nifty("#nav a","transparent bottom");
 <tr valign="bottom">
 <td><h1>priceTrackr</h1></td>
 <td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
-<div>
-<input type="text" name="q" id="searchInput" value="search..." size="20" maxlength="100" onfocus="searchInputClick();" onblur="searchInputBlur();" />
-<input type="image" alt="Submit" src="/images/search.png" style="vertical-align:middle" />
-</div>
+    <div>
+      <input type="text" name="q" id="searchInput" value="search..." size="20" maxlength="100" onfocus="searchInputClick();" onblur="searchInputBlur();" />
+      <input type="image" alt="Submit" src="/images/search.png" style="vertical-align:middle" />
+    </div>
 </form></td>
-
 </tr>
 </table>
 </div>
 <div id="menu">
-    <ul id="nav">
-        <li><a href="/">Home</a></li>
+  <ul id="nav">
+    <li><a href="/">Home</a></li>
     <li><a href="/faq/">FAQ</a></li>
     <li><a href="/contact/">Contact</a></li>
     <li><a href="/about/">About</a></li>
-    </ul>
+  </ul>
 </div>
 """
     body_template = """<div id="content">
-<div class="itemName"><h4><a href="http://www.newegg.com/Product/Product.asp?Item=%s" onClick="javascript:urchinTracker('/outgoing/newegg.com/%s');">%s</a></h4>
+<div class="itemName"><h4><a href="http://www.newegg.com/Product/Product.asp?Item=%s" onClick="javascript:pageTracker._trackPageview('/outgoing/newegg.com/%s');">%s</a></h4>
 <p>Model: %s</p></div>
 <div class="itemAdd">
 <script type="text/javascript"><!--
 google_ad_client = "pub-0638295794514727";
+/* 468x60, created 11/6/09 */
+google_ad_slot = "9316902769";
 google_ad_width = 468;
 google_ad_height = 60;
-google_ad_format = "468x60_as";
-google_ad_type = "text_image";
-google_ad_channel ="0017611932";
-google_color_border = "C8E9FF";
-google_color_bg = "C8E9FF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "FF0000";
-//--></script>
-
+//-->
+</script>
 <script type="text/javascript"
 src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
@@ -207,13 +199,12 @@ id="charts">
   </tr>
 </table>
 <p>* Shipping is calculated to zip code 93117. Minimum shipping is the lowest nonzero shipping cost.</p></div>
-
 <div id="adds">
 <h2>Advertisements</h2>
 <br/>
 <br/>
 <script type="text/javascript"><!--
-google_ad_client = "pub-0638295794514727";google_ad_width = 120;google_ad_height = 240;google_ad_format = "120x240_as";google_ad_type = "text_image";google_ad_channel ="6355930926";google_color_border = "336699";google_color_bg = "FFFFFF";google_color_link = "0000FF";google_color_text = "000000";google_color_url = "008000";
+google_ad_client="pub-0638295794514727";google_ad_width=120;google_ad_height=240;google_ad_format="120x240_as";google_ad_type="text_image";google_ad_channel="6355930926";google_color_border="336699";google_color_bg="FFFFFF";google_color_link="0000FF";google_color_text="000000";google_color_url="008000";
 //--></script>
 <script type="text/javascript"
   src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
@@ -224,13 +215,16 @@ google_ad_client = "pub-0638295794514727";google_ad_width = 120;google_ad_height
 <div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
 </div>
 </div>
-
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%%3E%%3C/script%%3E"));
 </script>
 <script type="text/javascript">
-_uacct = "UA-510348-5";
-urchinTracker();
-</script>
+try {
+var pageTracker = _gat._getTracker("UA-510348-5");
+pageTracker._setDomainName(".pricetrackr.com");
+pageTracker._trackPageview();
+} catch(err) {}</script>
 </body>
 </html>"""
 
@@ -319,4 +313,6 @@ if __name__ == '__main__':
     ids = [x['id'] for x in rows]
 
     generate_graph_pages(cursor, ids, '../nginx_root/graphs')
+    print "Graph pages complete"
     generate_item_pages(cursor, ids, '../nginx_root/items')
+    print "Item pages complete"

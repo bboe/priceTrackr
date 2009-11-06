@@ -1,6 +1,37 @@
+//httprequest
+var xmlhttp=false;
+/*@cc_on @*/
+/*@if (@_jscript_version >= 5)
+// JScript gives us Conditional compilation, we can cope with old IE versions.
+// and security blocked creation of the objects.
+ try {
+  xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+ } catch (e) {
+  try {
+   xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  } catch (E) {
+   xmlhttp = false;
+  }
+ }
+ @end @*/
+if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+    try {
+	xmlhttp = new XMLHttpRequest();
+    } catch (e) {
+	xmlhttp=false;
+    }
+}
+if (!xmlhttp && window.createRequest) {
+    try {
+	xmlhttp = window.createRequest();
+    } catch (e) {
+	xmlhttp=false;
+    }
+}
 //astrack
-function as_click () {
-	urchinTracker ('/asclick');
+function track_click () {
+    xmlhttp.open("HEAD", "/naive_click_tracking.png", false);
+    xmlhttp.send(null);
 }
 
 // incredibly funky onload add-event scripting, for all browsers
@@ -56,7 +87,7 @@ function adsense_init () {
 		for(var i = 0; i < el.length; i++) {
 			if(el[i].src.indexOf('sample.html') > -1) {
 
-				el[i].onfocus =  as_click;
+				el[i].onfocus =  track_click;
 			}
 		}
 	
@@ -104,7 +135,7 @@ function doPageExit(e) {
 		var inFrameY = (py > (adTop - 10) && py < (parseInt(adTop) + parseInt(ad[i].height) + 10));
 		
 		if (inFrameY && inFrameX) {
-		    alert('Click Detected')
+		    track_click()
 		}
 	}
 
