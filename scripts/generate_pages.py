@@ -86,22 +86,8 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <title>%s &raquo; priceTrackr</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <link rel="shortcut icon" href="/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="/style/layout.css" />
+<link rel="stylesheet" type="text/css" href="/layout.css" />
 <script type="text/javascript" src="/javascript.js"></script>
-<script type="text/javascript">
-function searchInputClick(){input=document.getElementById('searchInput')
-if(input.value=='search...')input.value=''}
-function searchInputBlur(){input=document.getElementById('searchInput')
-if(input.value=='')input.value='search...'}
-</script>
-<script type="text/javascript">
-window.onload=function() {
-Nifty("#container");
-Nifty("#adds,#content","same-height");
-Nifty("#header,#footer,#content h1","transparent");
-Nifty("#nav a","transparent bottom");
-}
-</script>
 </head>
 <body>
 <div id="container">
