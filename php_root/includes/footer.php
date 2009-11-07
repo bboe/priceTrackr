@@ -3,23 +3,13 @@ if(!(defined('START') && START)) exit('Not A Valid Entry Point');
 $db->free();
 ?>
 </div>
-<div id="adds">
-<h2>Advertisements</h2>
-<br/>
-<br/>
+<div id="ads">
 <script type="text/javascript"><!--
-    google_ad_client = "pub-0638295794514727";
-/* 120x240, created 11/6/09 */
-google_ad_slot = "6125003533";
-google_ad_width = 120;
-google_ad_height = 240;
+google_ad_client = "pub-0638295794514727";google_ad_slot = "6125003533";google_ad_width = 120;google_ad_height = 240;
 //-->
 </script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
 </div>
-
 <div id="footer">
 <div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
 </div>

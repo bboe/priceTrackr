@@ -119,16 +119,10 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <p>Model: %s</p></div>
 <div class="itemAdd">
 <script type="text/javascript"><!--
-google_ad_client = "pub-0638295794514727";
-/* 468x60, created 11/6/09 */
-google_ad_slot = "9316902769";
-google_ad_width = 468;
-google_ad_height = 60;
+google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_ad_width = 468;google_ad_height = 60;
 //-->
 </script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
 </div>
 <OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" 
@@ -184,19 +178,15 @@ id="charts">
     %s
   </tr>
 </table>
-<p>* Shipping is calculated to zip code 93117. Minimum shipping is the lowest nonzero shipping cost.</p></div>
-<div id="adds">
-<h2>Advertisements</h2>
-<br/>
-<br/>
-<script type="text/javascript"><!--
-google_ad_client="pub-0638295794514727";google_ad_width=120;google_ad_height=240;google_ad_format="120x240_as";google_ad_type="text_image";google_ad_channel="6355930926";google_color_border="336699";google_color_bg="FFFFFF";google_color_link="0000FF";google_color_text="000000";google_color_url="008000";
-//--></script>
-<script type="text/javascript"
-  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
+<p>* Shipping is calculated to zip code 93117. Minimum shipping is the lowest nonzero shipping cost.</p>
 </div>
-
+<div id="ads">
+<script type="text/javascript"><!--
+google_ad_client = "pub-0638295794514727";google_ad_slot = "6125003533";google_ad_width = 120;google_ad_height = 240;
+//-->
+</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div>
 <div id="footer">
 <div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
 </div>

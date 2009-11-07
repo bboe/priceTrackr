@@ -7,26 +7,29 @@ function searchInputBlur(){
     if(input.value=='')
 	input.value='search...';
 }
-var xmlhttp;
+var xmlhttp = false;
 if(window.XMLHttpRequest)
-    xmlhttp = new XMLHttpRequest;
+    xmlhttp = new XMLHttpRequest();
 else if(window.ActiveXObject)
     xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
 function track_click() {
-    xmlhttp.open("HEAD", "/naive_click_tracking.png", false);
-    xmlhttp.send(null)
-	}
+    if (xmlhttp) {
+	xmlhttp.open("HEAD", "/naive_click_tracking", false);
+	xmlhttp.send(null);
+	alert('Click recorded');
+    }
+}
 if(typeof window.addEventListener != "undefined")
     window.addEventListener("load", track_init, false);
 else if(typeof document.addEventListener != "undefined")
     document.addEventListener("load", track_init, false);
 else if(typeof window.attachEvent != "undefined")
     window.attachEvent("onload", track_init);
-function adsense_init() {
+function track_init() {
     if(document.all) {
 	var el = document.getElementsByTagName("iframe");
 	for(var i = 0; i < el.length; i++)
-	    if(el[i].src.indexOf("sample.html") > - 1)
+	    if(el[i].src.indexOf("pagead2.googlesyndication.com") > - 1)
 		el[i].onfocus = track_click;
     }
     else {

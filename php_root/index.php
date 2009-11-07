@@ -15,8 +15,6 @@ $Cache_Lite = new Cache_Lite($options);
 // Test if thereis a valide cache for this id
 if ($data = $Cache_Lite->get($id)) {
 	print $data;
-	print "\n".'<!--priceTrackr :)-->';
-
 } else { // No valid cache found (you have to make the page)
 	ob_start();
 	define('START', true);

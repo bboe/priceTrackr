@@ -11,8 +11,7 @@ p{font-size:100%;margin:0 10px 10px 20px;}
 #footer{clear:both;background:#91D3FF url(/images/gradient.png) repeat-x 0 -5px;padding:5px 0;text-align:center}
 #header h1{font-size:300%;color:#FFF}
 #content{float:left;width:550px;padding:10px 0;margin:5px 0;background:#C8E9FF}
-#adds{float:right;width:145px;background:#FFA191;padding:10px 0;margin:5px 0;text-align:center}
-#adds h2{font-size:150%;font-family:impact,sans-serif;letter-spacing:0}
+#ads{float:right;width:145px;padding:10px 0;margin:5px 0;text-align:center}
 #nav,#nav li{list-style-type:none;margin:0;padding:0}
 #menu{margin-left:5px}
 #nav li{float:left;margin-right:3px;text-align:center}
