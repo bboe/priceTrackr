@@ -1,12 +1,3 @@
-function searchInputClick(){
-    input=document.getElementById('searchInput');
-    if(input.value=='search...')input.value='';
-}
-function searchInputBlur(){
-    input=document.getElementById('searchInput');
-    if(input.value=='')
-	input.value='search...';
-}
 var xmlhttp = false;
 if(window.XMLHttpRequest)
     xmlhttp = new XMLHttpRequest();

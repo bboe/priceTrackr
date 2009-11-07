@@ -7,11 +7,11 @@ h4{font-size:120%}
 p{font-size:100%;margin:0 10px 10px 20px;}
 #container{width:700px !important; width /**/:710px;
     margin: 0 auto;padding:5px;text-align:left;background:#FFF}
-#header{background:#91D3FF url(/images/gradient.png) repeat-x 0 -5px;padding:0;width:700px}
-#footer{clear:both;background:#91D3FF url(/images/gradient.png) repeat-x 0 -5px;padding:5px 0;text-align:center}
+#header,#footer{background:#91D3FF url(/images/gradient.png) repeat-x 0 -5px;}
+#header{padding:0;width:700px}
+#footer{clear:both;padding:5px 0;text-align:center}
 #header h1{font-size:300%;color:#FFF}
-#content{float:left;width:550px;padding:10px 0;margin:5px 0;background:#C8E9FF}
-#ads{float:right;width:145px;padding:10px 0;margin:5px 0;text-align:center}
+#content{float:left;width:700px;padding:10px 0;margin:5px 0;background:#C8E9FF}
 #nav,#nav li{list-style-type:none;margin:0;padding:0}
 #menu{margin-left:5px}
 #nav li{float:left;margin-right:3px;text-align:center}
