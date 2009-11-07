@@ -30,8 +30,8 @@ else {
   }
   if ($terms != '') print '<p class="mesg">The following terms have been ignored:'. $terms . '</p>';
   $result = $db->prepare_execute('select newegg_id, title, match(title, model) against (? in boolean mode) as score from item where match(title, model) against (? in boolean mode) order by score desc limit 30', array($q, $q), array('text', 'text'), true, false);
-  $time = microtime(true)-$start;
-  print '<p class="searchTime">'. $time . ' seconds</p>';
+  $time = (microtime(true)-$start) * 1000;
+  print '<p class="searchTime">Search took: '. round($time,1) . ' milliseconds</p>';
   $size = sizeof($result);
   if ($size == 0) {
     print '<p>No results found. Please <a href="/contact/">contact us</a> if you believe priceTrackr is missing something.</p>';
