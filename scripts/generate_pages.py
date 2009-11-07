@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import math, os, sys
+import datetime, math, os, sys
 import MySQLdb
 
 def generate_graph_pages(db, ids, directory):
@@ -8,16 +8,20 @@ def generate_graph_pages(db, ids, directory):
   <chart_value prefix="$" decimals="2" separator="," position="cursor" size="14" color="000000" background_color="FFD991" alpha="90" />
   <chart_pref line_thickness="2" point_shape="none" />
   <chart_transition type="slide_down" delay="0" duration="1" order="series" />
-  <legend_rect x="5" y="5" width="490" />
+  <legend_label size="14" />
+  <legend_rect width="680" x="10"/>
   <legend_transition type="slide_right" />
+  <axis_category size="14" />
   <series_color>
     <value>FFCF75</value>
-    <value>AA5C4E</value>
     <value>4E85AA</value>
+    <value>FFA191</value>
+    <value>AA5C4E</value>
   </series_color>
   <series_explode>
+    <value>350</value>
     <value>250</value>
-    <value>175</value>
+    <value>150</value>
     <value>100</value>
   </series_explode>
 </chart>
@@ -34,30 +38,55 @@ def generate_graph_pages(db, ids, directory):
                             'history where id = %s order by date']),
                            id)
         rows = cursor.fetchall()
-        data = []
 
+        data = []
         max_axis = 0
         min_axis = 0x7FFFFFF
-        
-        prev_date = None
-        for row in rows:
-            tmp = [row['date'].date()]
+
+        cur_date = rows[0]['date'].date()
+        delta_days = (rows[-1]['date'].date() - cur_date).days
+        if delta_days < 5:
+            label_delta = 1
+        else:
+            label_delta = delta_days / 5
+        i = 0
+        while cur_date <= rows[-1]['date'].date():
+            while rows[i]['date'].date() < cur_date:
+                i += 1
+            row = rows[i]
+
+#             if cur_date.day == 1:  # list only months
+            if len(data) % label_delta == 0: # list every label_delta dates
+                print_date = cur_date
+            else:
+                print_date = ''
+
+            if row['date'].date() != cur_date:
+                data.append([print_date, None, None, None, None])
+                cur_date += datetime.timedelta(days=1)
+                continue
+            else:
+                cur_date += datetime.timedelta(days=1)
+
+            tmp = [print_date]
             tmp.extend([x / 100. for x in [row['original'], row['price'],
                                            row['rebate'],
                                            row['original'] + row['shipping']]])
 
-            if row['date'].date() != prev_date:
-                data.append(tmp)
-                prev_date = row['date'].date()
-            else:
-                data[-1] = tmp
+            data.append(tmp)
             if tmp[3] < min_axis: min_axis = tmp[3]
             if tmp[4] > max_axis: max_axis = tmp[4]
 
-        output = ''.join(['<chart>\n  <axis_value min="%d" max="%d" ',
-                          'steps="%d" prefix="$" />\n  <chart_data>\n']) % \
-                          (math.floor(min_axis * .95),
-                           math.ceil(max_axis * 1.05), 5)
+        if min_axis == max_axis:
+            extra = 5
+        else:
+            delta = max_axis - min_axis
+            extra = (delta / .9) - delta
+
+        output = ''.join(['<chart>\n  <axis_value min="%d" max="%d" size="14"',
+                          ' steps="%d" prefix="$" />\n  <chart_data>\n']) % \
+                          (math.floor(min_axis - extra),
+                           math.ceil(max_axis + extra), 5)
 
         for i, column in enumerate([None, 'original', '+ savings', '+ rebates',
                                     'original + shipping']):
@@ -69,8 +98,10 @@ def generate_graph_pages(db, ids, directory):
             for row in data:
                 if i == 0:
                     output += '      <string>%s</string>\n' % row[i].__str__()[2:]
-                else:
+                elif row[i]:
                     output += '      <number>%.2f</number>\n' % row[i]
+                else:
+                    output += '      <null/>\n'
             output += '    </row>\n'
         output += '  </chart_data>\n%s' % end_xml_data
         file = open(os.path.join(directory, '%s.html' % newegg_id), 'w')
@@ -98,8 +129,8 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <td><h1>priceTrackr</h1></td>
 <td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
     <div>
-      <input type="text" name="q" id="searchInput" value="search..." size="20" maxlength="100" onfocus="searchInputClick();" onblur="searchInputBlur();" />
-      <input type="image" alt="Submit" src="/images/search.png" style="vertical-align:middle" />
+      <input type="text" name="q" size="20" maxlength="100" />
+      <input type="submit" value="search" style="vertical-align:middle" />
     </div>
 </form></td>
 </tr>
@@ -109,7 +140,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   <ul id="nav">
     <li><a href="/">Home</a></li>
     <li><a href="/faq/">FAQ</a></li>
-    <li><a href="/contact/">Contact</a></li>
     <li><a href="/about/">About</a></li>
   </ul>
 </div>
@@ -126,8 +156,8 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
 </div>
 <OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" 
-WIDTH="400" 
-HEIGHT="250" 
+WIDTH="700" 
+HEIGHT="350" 
 id="charts">
   <PARAM NAME="movie" VALUE="/charts.swf?library_path=/charts_library&xml_source=/g/%s" />
   <PARAM NAME="quality" VALUE="high" />
@@ -137,8 +167,8 @@ id="charts">
   <EMBED src="/charts.swf?library_path=/charts_library&xml_source=/g/%s"
  quality="high" 
  bgcolor="#C8E9FF" 
- WIDTH="500" 
- HEIGHT="250" 
+ WIDTH="700" 
+ HEIGHT="350" 
  NAME="charts" 
  allowScriptAccess="sameDomain" 
  swLiveConnect="true" 
@@ -180,17 +210,11 @@ id="charts">
 </table>
 <p>* Shipping is calculated to zip code 93117. Minimum shipping is the lowest nonzero shipping cost.</p>
 </div>
-<div id="ads">
-<script type="text/javascript"><!--
-google_ad_client = "pub-0638295794514727";google_ad_slot = "6125003533";google_ad_width = 120;google_ad_height = 240;
-//-->
-</script>
-<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div>
 <div id="footer">
 <div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
 </div>
 </div>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%%3E%%3C/script%%3E"));
@@ -283,10 +307,18 @@ def reverse_id(id):
 if __name__ == '__main__':
     conn = MySQLdb.connect(user='pt_user', passwd='pritshiz', db='priceTrackr')
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+    
+    if len(sys.argv) == 2:
+        filter = ' where newegg_id = %s'
+        filter_id = sys.argv[1]
+    else:
+        filter = ''
+        filter_id = None
 
-    count = cursor.execute('SELECT id from item')
+    count = cursor.execute('SELECT id from item%s' % filter, filter_id)
     rows = cursor.fetchall()
     ids = [x['id'] for x in rows]
+    print 'Found %d items' % len(ids)
 
     generate_graph_pages(cursor, ids, '../nginx_root/graphs')
     print "Graph pages complete"
