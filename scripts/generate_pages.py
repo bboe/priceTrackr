@@ -1,6 +1,26 @@
 #!/usr/bin/env python
 import datetime, math, os, sys
 import MySQLdb
+import sitemap_gen
+
+
+def generate_sitemap(newegg_ids, directory):
+    sitemap = 'sitemap.xml.gz'
+    lastmod = datetime.date.today().__str__()
+    sm = sitemap_gen.Sitemap(True)
+    sm._base_url = 'http://test.pricetrackr.com/'
+    sm._filegen = sitemap_gen.FilePathGenerator()
+    sm._filegen.Preload(sitemap)
+    sm._wildurl1 = sm._filegen.GenerateWildURL(sm._base_url)
+    sm._wildurl2 = sm._filegen.GenerateURL(sitemap_gen.SITEINDEX_SUFFIX,
+                                           sm._base_url)
+    urls = ['/i/%s/' % x for x in newegg_ids]
+    for url in urls:
+        sm._inputs.append(sitemap_gen.InputURL({'href':url,
+                                                'lastmod':lastmod,
+                                                'changefreq':'daily'}))
+    sm.Generate()
+    os.rename(sitemap, os.path.join(directory, sitemap))
 
 def generate_graph_pages(db, ids, directory):
     end_xml_data = """  <license>K1XUXQVMDNCL.NS5T4Q79KLYCK07EK</license>
@@ -315,11 +335,14 @@ if __name__ == '__main__':
         filter = ''
         filter_id = None
 
-    count = cursor.execute('SELECT id from item%s' % filter, filter_id)
+    count = cursor.execute('SELECT id, newegg_id from item%s' % filter, filter_id)
     rows = cursor.fetchall()
     ids = [x['id'] for x in rows]
+    newegg_ids = [x['newegg_id'] for x in rows]
     print 'Found %d items' % len(ids)
 
+    generate_sitemap(newegg_ids, '../nginx_root/')
+    print "Sitemap complete"
     generate_graph_pages(cursor, ids, '../nginx_root/graphs')
     print "Graph pages complete"
     generate_item_pages(cursor, ids, '../nginx_root/items')
