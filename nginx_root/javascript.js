@@ -7,7 +7,7 @@ function track_click() {
     if (xmlhttp) {
 	xmlhttp.open("HEAD", "/naive_click_tracking", false);
 	xmlhttp.send(null);
-	alert('Click recorded');
+	//alert('Click recorded');
     }
 }
 if(typeof window.addEventListener != "undefined")

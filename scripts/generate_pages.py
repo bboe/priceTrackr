@@ -132,7 +132,7 @@ def generate_item_pages(db, ids, directory):
     title_template = """<!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>%s &raquo; priceTrackr</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
@@ -140,7 +140,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <link rel="stylesheet" type="text/css" href="/layout.css" />
 <script type="text/javascript" src="/javascript.js"></script>
 </head>
-<body>
+<body onload="document.getElementById('q').focus()">
 <div id="container">
 <div id="header">
 <table style="width:99%%">
@@ -149,7 +149,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <td><h1>priceTrackr</h1></td>
 <td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
     <div>
-      <input type="text" name="q" size="20" maxlength="100" />
+      <input type="text" name="q" id="q" size="20" maxlength="100" />
       <input type="submit" value="search" style="vertical-align:middle" />
     </div>
 </form></td>
@@ -165,7 +165,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 </div>
 """
     body_template = """<div id="content">
-<div class="itemName"><h4><a href="http://www.newegg.com/Product/Product.asp?Item=%s" onClick="javascript:pageTracker._trackPageview('/outgoing/newegg.com/%s');">%s</a></h4>
+<div class="itemName"><h4><a href="http://www.newegg.com/Product/Product.asp?Item=%s" onclick="javascript:pageTracker._trackPageview('/outgoing/newegg.com/%s');">%s</a></h4>
 <p>Model: %s</p></div>
 <div class="itemAdd">
 <script type="text/javascript"><!--
@@ -174,29 +174,18 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
 </script>
 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
 </div>
-<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" 
-WIDTH="700" 
-HEIGHT="350" 
-id="charts">
-  <PARAM NAME="movie" VALUE="/charts.swf?library_path=/charts_library&xml_source=/g/%s" />
-  <PARAM NAME="quality" VALUE="high" />
-  <PARAM NAME="bgcolor" VALUE="#666666" />
+<object
+   type="application/x-shockwave-flash"
+   data="/charts.swf?library_path=/charts_library&amp;xml_source=/g/%s"
+   width="700" height="350">
+  <param
+     name="movie"
+     value="/charts.swf?library_path=/charts_library&amp;xml_source=/g/%s" />
+  <param name="quality" value="high" />
+  <param name="bgcolor" value="#C8E9FF" />
+  <param name="wmode" value="transparent" />
   <param name="allowScriptAccess" value="sameDomain" />
-  
-  <EMBED src="/charts.swf?library_path=/charts_library&xml_source=/g/%s"
- quality="high" 
- bgcolor="#C8E9FF" 
- WIDTH="700" 
- HEIGHT="350" 
- NAME="charts" 
- allowScriptAccess="sameDomain" 
- swLiveConnect="true" 
- TYPE="application/x-shockwave-flash" 
- PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
-
-  </EMBED>
-</OBJECT>
+</object>
 """
     stats_template = """<h3>Statistics</h3>
 <table class="stats">
@@ -341,8 +330,9 @@ if __name__ == '__main__':
     newegg_ids = [x['newegg_id'] for x in rows]
     print 'Found %d items' % len(ids)
 
-    generate_sitemap(newegg_ids, '../nginx_root/')
-    print "Sitemap complete"
+    if not filter_id:
+        generate_sitemap(newegg_ids, '../nginx_root/')
+        print "Sitemap complete"
     generate_graph_pages(cursor, ids, '../nginx_root/graphs')
     print "Graph pages complete"
     generate_item_pages(cursor, ids, '../nginx_root/items')

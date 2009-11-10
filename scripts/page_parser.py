@@ -142,6 +142,3 @@ if __name__ == '__main__':
     output = open('%s.pkl' % directory.rstrip('/'), 'w')
     cPickle.dump(items, output, cPickle.HIGHEST_PROTOCOL)
     output.close()
-
-
-
