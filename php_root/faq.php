@@ -13,7 +13,7 @@ $options = array(
 $Cache_Lite = new Cache_Lite($options);
 
 // Test if thereis a valide cache for this id
-if (false && $data = $Cache_Lite->get($id)) {
+if ($data = $Cache_Lite->get($id)) {
 	print $data;
 } else { // No valid cache found (you have to make the page)
 	ob_start();
