@@ -20,7 +20,7 @@ function track_init() {
     if(document.all) {
 	var el = document.getElementsByTagName("iframe");
 	for(var i = 0; i < el.length; i++)
-	    if(el[i].src.indexOf("pagead2.googlesyndication.com") > - 1)
+	    if(el[i].src.indexOf("google") > - 1)
 		el[i].onfocus = track_click;
     }
     else {
