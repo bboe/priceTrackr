@@ -22,7 +22,19 @@ if ($data = $Cache_Lite->get($id)) {
 	require_once 'includes/header.php';
 ?>
 
-<h1>Welcome to priceTrackr</h1>
+<h1>priceTrackr is BACK!!!</h1>
+<p>Yes, after two years priceTrackr is finally up and running again. To get
+  started please read the below, or checkout the following products whose
+  price history is rather interesting.</p>
+
+<ul>
+  <li><a href="/i/N82E16833124349/">Real newegg product, example 1</a></li>
+  <li><a href="/i/N82E16820145262/">Real newegg product, example 2</a></li>
+  <li><a href="/i/N82E16820145247/">Real newegg product, example 3</a></li>
+</ul>
+
+<h2>What is priceTrackr?</h2>
+
 <p>priceTrackr is a service which tracks nearly 100% of Newegg's items over
   time and presents each item's price on a timeline with a line for each of
   the following:</p>

@@ -77,7 +77,8 @@ if ($data = $Cache_Lite->get($id)) {
   15, 2009. This time around priceTrackr doesn't just crawl a few items from
   Newegg, but rather nearly 100% of Newegg's items.</p>
 
-<p>priceTrackr was reintroduced into the wild on November XX, 2009...</p>
+<p>priceTrackr was reintroduced into the wild on November 10, 2009... (more 
+  to come)</p>
 
 <h2>Contact</h2>
 <p>If you have any questions or comments regarding priceTrackr please email
