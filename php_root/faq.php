@@ -13,37 +13,40 @@ $options = array(
 $Cache_Lite = new Cache_Lite($options);
 
 // Test if thereis a valide cache for this id
-if ($data = $Cache_Lite->get($id)) {
+if (false && $data = $Cache_Lite->get($id)) {
 	print $data;
 } else { // No valid cache found (you have to make the page)
 	ob_start();
 	define('START', true);
 	$title = 'FAQ';
 	require_once 'includes/header.php';
+?>
 
-	print '<h1>Frequently Asked Questions</h1>';
+<h1>Frequently Asked Questions</h1>
 
-	$result = $db->query('select id, question, answer from faq order by date_added');
+<ol>
+  <li><a href="#0">Why create priceTrackr?</a></li>
+  <li><a href="#1">How should the graphs be interpreted?</a></li>
+</ol>
 
-	$count = 0;
-	print '<ol>';
-	foreach ($result as $value) {
-		print '<li><a href="#'.$count .'">'.$value['question'].'</a></li>'."\n";
-		$count++;
-	}
-	print '</ol>';
+<div class="faq">
+  <h4><a name="0"></a>Why create priceTrackr?</h4>
+  <div class="answer">
+    <p>priceTrackr was created so that one can make a more informed decision before purchasing items on newegg.</p>
+  </div>
+</div>
 
-	$count = 0;
-	foreach ($result as $value) {
-		print '<div class="faq">';
-		print '<h4><a name="' . $count . '"></a>'.$value['question'].'</h4>'."\n";
-		print '<div class="answer">'.$value['answer'].'</div>';
-		print '</div>'."\n";
-		$count++;
-	}
-
-	require_once 'includes/footer.php';
-	$data = ob_get_flush();
-	$Cache_Lite->save($data);
+<div class="faq">
+  <h4><a name="1"></a>How should the graphs be interpreted?</h4>
+  <div class="answer">
+    <p>Each graph has three sections.  The first section is the price + shipping which is the price one would pay in the absence of savings or rebates.</p>
+    <p>The second section is + savings which includes the instant savings from the company.  This essentially is what you must pay to get the item.</p>
+    <p>The final section is + rebate which adds in the rebate to the savings price.  This, in a sense, is the overall cost of the item once the rebate check is received.</p>
+  </div>
+</div>
+<?php
+require_once 'includes/footer.php';
+$data = ob_get_flush();
+$Cache_Lite->save($data);
 }
 ?>
