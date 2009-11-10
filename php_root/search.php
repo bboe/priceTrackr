@@ -24,6 +24,11 @@ $len = strlen($q);
 if ($len == 0) print '<p class="mesg">No search terms entered.</p>';
 else if ($len > 100) print '<p class="mesg">Search string too long.</p>';
 else {
+  if ($id = id_to_num($q)) {
+    header('Location: /i/'.$q.'/');
+    exit();
+  }
+
   $terms = '';
   foreach (explode(' ', $q) as $i) {
     if (strlen($i) < 2) $terms .= " '$i'";

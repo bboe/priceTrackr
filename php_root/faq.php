@@ -36,7 +36,7 @@ if ($data = $Cache_Lite->get($id)) {
 	$count = 0;
 	foreach ($result as $value) {
 		print '<div class="faq">';
-		print '<h2><a name="' . $count . '"></a>'.$value['question'].'</h2>'."\n";
+		print '<h4><a name="' . $count . '"></a>'.$value['question'].'</h4>'."\n";
 		print '<div class="answer">'.$value['answer'].'</div>';
 		print '</div>'."\n";
 		$count++;

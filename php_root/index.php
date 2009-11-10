@@ -13,7 +13,7 @@ $options = array(
 $Cache_Lite = new Cache_Lite($options);
 
 // Test if thereis a valide cache for this id
-if ($data = $Cache_Lite->get($id)) {
+if (false) { //$data = $Cache_Lite->get($id)) {
 	print $data;
 } else { // No valid cache found (you have to make the page)
 	ob_start();
@@ -23,21 +23,43 @@ if ($data = $Cache_Lite->get($id)) {
 ?>
 
 <h1>Welcome to priceTrackr</h1>
-<p>priceTrackr will give you the price history of specific items with the following factors included:</p>
-<ul>
-<li>Original Price</li>
-<li>Store discount</li>
-<li>Rebate discount</li>
-<li>Shipping price</li>
-</ul>
-<p>Using all of these we calculate the out the door price on items on a day by day basis.
-</p>
-<p>At this time it is only possible to find items through the search.  A browse by category section will be added soon.</p>
-<h2>priceTrackr News</h2>
-<p>2009-10-15 - priceTrackr is back!</p>
-<p>2007-01-21 - So priceTrackr probably wont be coming back up as I cannot afford a dedicated server and the tracking scripts "utilize too many resources" which is complete BS. As the whole purpose of this website was to aid in making purchases I offer the following link. <a href="http://labs.anandtech.com/">labs.anandtech.com</a>.</p>
-<p>2007-01-06 - As some of you may have noticed priceTrackr was down for roughly a day due to my update scripts running and as I was told utilizing too much of the server's resources. Anyways this means my update scripts are not currently running, though I should have a work around for this current situation soon.
+<p>priceTrackr is a service which tracks nearly 100% of Newegg's items over
+  time and presents each item's price on a timeline with a line for each of
+  the following:</p>
+<dl>
+  <dt>Original price</dt>
+  <dd>- The base price of the item.</dd>
+  <dt>Instant savings price</dt>
+  <dd>- The original price of the item with instant savings subtracted.</dd>
+  <dt>Rebate savings price</dt>
+  <dd>- The original price of the item with both the instant savings and
+    rebate savings subtracted.</dd>
+  <dt>Shipping price</dt>
+  <dd>- The original price of the item, plus the cost to ship that item to zip
+    code 93117 (Goleta, CA).</dd>
+</dl>
 
+<h3>How do I use this site?</h3>
+<p>At present the only way to navigate this site is through search. Ideally you
+  will know exactly what you're searching for after having navigated through
+  Newegg to find it. You can search for anything within the title of the item,
+  or by entering the Newegg product id directly into the search field you can
+  go directly to the priceTrackr page for that item.</p>
+
+<p>Finding the Newegg product id is as simple as copying part of the Newegg url
+  when looking at a particular item. If you are on the product page for
+  "Crucial 6GB (3 x 2GB) 240-Pin DDR3 SDRAM DDR3 1066 (PC3 8500) Triple
+  Channel Kit Desktop Memory", then the url in the browser will be:</p>
+<p style="margin-left:50px">
+  http://www.newegg.com/Product/Product.asp?Item=<span class="min"
+							>N82E16820148246</span>
+</p>
+<p>That last part colored in blue is the Newegg product id. Copying and
+  pasting <span class="min">N82E16820148246</span> into the search box will
+  take you directly to the product's page. Give it a try.</p>
+
+<h3>priceTrackr News</h3>
+<p>2009-10-15 - priceTrackr is back after two years of inactivity.</p>
 <?php
 require_once 'includes/footer.php';
 $data = ob_get_flush();

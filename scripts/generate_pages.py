@@ -8,7 +8,7 @@ def generate_sitemap(newegg_ids, directory):
     sitemap = 'sitemap.xml.gz'
     lastmod = datetime.date.today().__str__()
     sm = sitemap_gen.Sitemap(True)
-    sm._base_url = 'http://test.pricetrackr.com/'
+    sm._base_url = 'http://www.pricetrackr.com/'
     sm._filegen = sitemap_gen.FilePathGenerator()
     sm._filegen.Preload(sitemap)
     sm._wildurl1 = sm._filegen.GenerateWildURL(sm._base_url)

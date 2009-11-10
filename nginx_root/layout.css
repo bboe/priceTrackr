@@ -4,7 +4,7 @@ h1{font-size:250%;font-family:impact,sans-serif;letter-spacing:0}
 h2{font-size:180%}
 h3{font-size:150%}
 h4{font-size:120%}
-p{font-size:100%;margin:0 10px 10px 20px;}
+p, dl{font-size:100%;margin:0 10px 10px 20px;}
 #container{width:700px !important; width /**/:710px;
     margin: 0 auto;padding:5px;text-align:left;background:#FFF}
 #header,#footer{background:#91D3FF url(/images/gradient.png) repeat-x 0 -5px;}
