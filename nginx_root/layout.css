@@ -28,7 +28,7 @@ div.faq{margin-bottom:10px}
 .mesg{color:#F00;margin:0 10px 0 20px;font-size:80%}
 .itemName h4{font-family:"Trebuchet MS",Arial,sans-serif}
 .itemName p{margin-left:10px}
-table.stats{margin:10px;width:100%;text-align:center;font-size:95%}
+table.stats{padding:10px;width:100%;text-align:center;font-size:95%}
 .min{color:#00F}
 .max{color:#F00}
 .itemAdd{text-align:center;padding-bottom:10px}

@@ -26,7 +26,8 @@ if ($data = $Cache_Lite->get($id)) {
 
 <ol>
   <li><a href="#0">Why create priceTrackr?</a></li>
-  <li><a href="#1">How should the graphs be interpreted?</a></li>
+  <li><a href="#1">Why are there holes for some dates in the charts?</a></li>
+  <li><a href="#2">How should the charts be interpreted?</a></li>
 </ol>
 
 <div class="faq">
@@ -37,11 +38,35 @@ if ($data = $Cache_Lite->get($id)) {
 </div>
 
 <div class="faq">
-  <h4><a name="1"></a>How should the graphs be interpreted?</h4>
+  <h4><a name="1"></a>Why are there holes for some dates in the charts?</h4>
   <div class="answer">
-    <p>Each graph has three sections.  The first section is the price + shipping which is the price one would pay in the absence of savings or rebates.</p>
-    <p>The second section is + savings which includes the instant savings from the company.  This essentially is what you must pay to get the item.</p>
-    <p>The final section is + rebate which adds in the rebate to the savings price.  This, in a sense, is the overall cost of the item once the rebate check is received.</p>
+    <p>Holes can appear in a chart for a few reasons. A crawl of Newegg
+      may not have occurred on that date, an error may have occurred while
+      crawling a specific item, or an item was placed in a deactivated state on
+      Newegg. Except for in the case of a deactivated item, it should be pretty
+      easy to extrapolate what the prices on the missing dates were.</p>
+  </div>
+</div>
+
+<div class="faq">
+  <h4><a name="2"></a>How should the charts be interpreted?</h4>
+  <div class="answer">
+    <p>Each chart has four lines.  The first line, "original", is the price one
+      of the item in the absence of savings, rebates and shipping. The second
+      line, "+ savings", is the price after Newegg's instant savings on the
+      item. This is the cost to purchase the item, when not considering the
+      cost of shipping. The third line, "+ rebates", is the previous price with
+      any rebates also added on. The final line, "original + shipping", allows
+      one to track the variance in shipping over time with respect to the
+      original price.</p>
+    <p>The best way to look at the specific pieces is to compare them to the
+      other lines. When "+ savings" differs from the original, then at that
+      point in time there was savings on the item. Likewise when "+ rebates"
+      differs from "+ savings" there was rebates on the item.</p>
+    <p>The reason for comparing the shipping to the original price, rather than
+      to tack on after the rebates price is that the original price varries
+      much less than the rebates price, therefore it is simpler to monitor
+      variations in the shipping price as is.</p>
   </div>
 </div>
 <?php

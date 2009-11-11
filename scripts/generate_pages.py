@@ -27,7 +27,7 @@ def generate_graph_pages(db, ids, directory):
   <chart_type>Line</chart_type>
   <chart_value prefix="$" decimals="2" separator="," position="cursor" size="14" color="000000" background_color="FFD991" alpha="90" />
   <chart_pref line_thickness="2" point_shape="none" />
-  <chart_transition type="slide_down" delay="0" duration="1" order="series" />
+  <chart_transition type="slide_down" delay="0" duration=".5" order="series" />
   <legend_label size="14" />
   <legend_rect width="680" x="10"/>
   <legend_transition type="slide_right" />
@@ -191,27 +191,27 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
 <table class="stats">
   <tr>
     <th><h3>Prices</h3></th>
-    <th><h3>Current</h3></th>
-    <th><h3>Minimum</h3></th>
-    <th><h3>Maximum</h3></th>
+    <th><h3>as of %s</h3></th>
+    <th><h3 class="min">Minimum</h3></th>
+    <th><h3 class="max">Maximum</h3></th>
   </tr>
-  <tr>
+  <tr style="background:#FFCF75">
     <td>original</td>
     <td>$%.2f</td>
-    <td><span class="min">$%.2f</span> on %s</td>
-    <td><span class="max">$%.2f</span> on %s</td>
+    <td>$%.2f on %s</td>
+    <td>$%.2f on %s</td>
   </tr>
-  <tr>
+  <tr style="background:#4E85AA">
     <td>+ savings</td><td>$%.2f</td>
-    <td><span class="min">$%.2f</span> on %s</td>
-    <td><span class="max">$%.2f</span> on %s</td>
+    <td>$%.2f on %s</td>
+    <td>$%.2f on %s</td>
   </tr>
-  <tr>
-    <td>+ rebate</td><td>$%.2f</td>
-    <td><span class="min">$%.2f</span> on %s</td>
-    <td><span class="max">$%.2f</span> on %s</td>
+  <tr style="background:#FFA191">
+    <td>+ rebates</td><td>$%.2f</td>
+    <td>$%.2f on %s</td>
+    <td>$%.2f on %s</td>
   </tr>
-  <tr>
+  <tr style="background:#AA5C4E">
     <td>shipping*</td>
     <td>%s</td>
     %s
@@ -250,6 +250,7 @@ pageTracker._trackPageview();
                             'and item.id = %s order by update_date']), id)
         rows = cursor.fetchall()
         current = rows[-1]
+        current_date = current['update_date'].date()
         newegg_id = current['newegg_id']
 
         keys = ['original', 'price', 'rebate', 'shipping']
@@ -272,14 +273,19 @@ pageTracker._trackPageview();
         output +=  body_template % (newegg_id, newegg_id, current['title'],
                                     current['model'], newegg_id, newegg_id)
         if min['shipping'][1]:
-            shipping = """<td><span class="min">$%.2f</span> on %s*</td>
-    <td><span class="max">$%.2f</span> on %s</td>""" % \
+            shipping = """<td>$%.2f on %s*</td>
+    <td>$%.2f on %s</td>""" % \
                 (min['shipping'][0] / 100., min['shipping'][1],
                  max['shipping'][0] / 100., min['shipping'][1])
         else:
             shipping = "<td colspan=2><strong>Always Free Shipping</strong></td>"
 
-        output += stats_template % (current['original'] / 100.,
+        if current['shipping'] != 0:
+            current_shipping = '$%.2f' % (current['shipping'] / 100.)
+        else:
+            current_shipping = '<strong>FREE!</strong>'
+
+        output += stats_template % (current_date, current['original'] / 100.,
                                     min['original'][0] / 100.,
                                     min['original'][1],
                                     max['original'][0] / 100.,
@@ -294,7 +300,7 @@ pageTracker._trackPageview();
                                     min['rebate'][1],
                                     max['rebate'][0] / 100.,
                                     max['rebate'][1],
-                                    current['shipping'] / 100.,
+                                    current_shipping,
                                     shipping)
 
         file = open(os.path.join(directory, '%s.html' % newegg_id), 'w')
