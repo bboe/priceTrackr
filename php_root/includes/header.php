@@ -33,7 +33,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 </table>
 </div>
 <?php
-$home_class = $faq_class = $contact_class = $about_class = '';
+$home_class = $faq_class = $about_class = '';
 switch ($_SERVER['SCRIPT_NAME']) {
  case '/index.php': $home_class = ' class="active"'; break;
  case '/faq.php': $faq_class = ' class="active"'; break;
@@ -43,6 +43,7 @@ switch ($_SERVER['SCRIPT_NAME']) {
 <div id="menu">
   <ul id="nav">
     <li><a href="/"<?php echo $home_class; ?>>Home</a></li>
+    <li><a href="/daily/">Daily Drops</a></li>
     <li><a href="/faq/"<?php echo $faq_class; ?>>FAQ</a></li>
     <li><a href="/about/"<?php echo $about_class; ?>>About</a></li>
   </ul>

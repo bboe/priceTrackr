@@ -3,11 +3,79 @@ import datetime, math, os, sys
 import MySQLdb
 import sitemap_gen
 
+SITE_HEADER = """<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>%s &raquo; priceTrackr</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="/layout.css" />
+<script type="text/javascript" src="/javascript.js"></script>
+</head>
+<body onload="document.getElementById('q').focus()">
+<div id="container">
+<div id="header">
+<table style="width:99%%">
+<!-- How can I do this without a table? -->
+<tr valign="bottom">
+<td><h1>priceTrackr</h1></td>
+<td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
+    <div>
+      <input type="text" name="q" id="q" size="20" maxlength="100" />
+      <input type="submit" value="search" style="vertical-align:middle" />
+    </div>
+</form></td>
+</tr>
+</table>
+</div>
+<div id="menu">
+  <ul id="nav">
+    <li><a href="/">Home</a></li>
+    <li><a href="/daily/"%s>Daily Drops</a></li>
+    <li><a href="/faq/">FAQ</a></li>
+    <li><a href="/about/">About</a></li>
+  </ul>
+</div>
+<div id="content">
+"""
+
+SITE_FOOTER = """</div>
+<div id="footer">
+<div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
+</div>
+</div>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-510348-5");
+pageTracker._setDomainName(".pricetrackr.com");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>
+"""
+
+ITEM_ADD = """<div class="itemAdd">
+<script type="text/javascript"><!--
+google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_ad_width = 468;google_ad_height = 60;
+//-->
+</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div>
+"""
+
+
 
 def generate_sitemap(newegg_ids, directory):
     sitemap = 'sitemap.xml.gz'
     lastmod = datetime.date.today().__str__()
-    sm = sitemap_gen.Sitemap(True)
+    sm = sitemap_gen.Sitemap(False)
     sm._base_url = 'http://www.pricetrackr.com/'
     sm._filegen = sitemap_gen.FilePathGenerator()
     sm._filegen.Preload(sitemap)
@@ -19,10 +87,54 @@ def generate_sitemap(newegg_ids, directory):
         sm._inputs.append(sitemap_gen.InputURL({'href':url,
                                                 'lastmod':lastmod,
                                                 'changefreq':'daily'}))
+
+    today = datetime.date.today().__str__()
+    sm._inputs.append(sitemap_gen.InputURL({'href':'/',
+                                            'changefreq':'weekly'}))
+    sm._inputs.append(sitemap_gen.InputURL({'href':'/daily/', 'lastmod':today,
+                                            'changefreq':'daily'}))
+    sm._inputs.append(sitemap_gen.InputURL({'href':'/faq/',
+                                            'changefreq':'weekly'}))
+    sm._inputs.append(sitemap_gen.InputURL({'href':'/about/',
+                                            'changefreq':'weekly'}))
+    
+    
     sm.Generate()
     os.rename(sitemap, os.path.join(directory, sitemap))
 
+def generate_daily_drops(db, drops, directory):
+    output_html = 'daily.html'
+    
+    output = SITE_HEADER % ('Daily Drops', ' class="active"')
+    output += '<h1>Daily Drops</h1>\n\n'
+
+    i = 0
+    for score, id, drop, percent, total in sorted(drops, reverse=True)[:50]:
+        i += 1
+        db.execute('SELECT title, newegg_id from item where item.id = %s', id)
+        row = cursor.fetchone()
+        output += '<p><a href="/i/%s/">%s</a><br/>\n' % (row['newegg_id'],
+                                                            row['title'])
+        output += ' '.join(['Drop Value: <strong>$%.2f</strong>',
+                            'Drop Percent: <strong>%.0f%%</strong>',
+                            'Current Cost: <strong>$%.2f</strong></p>\n']) \
+                            % (drop / 100., percent * 100., total / 100.)
+        
+        if i % 10 == 0:
+            output += ITEM_ADD
+
+    output += SITE_FOOTER
+    out_file = open(os.path.join(directory, output_html), 'w')
+    out_file.write(output)
+    out_file.close()    
+
 def generate_graph_pages(db, ids, directory):
+    """Returns list of (drop_score, id, drop, drop_percent, current_total)"""
+    drops = []
+    #today = datetime.date.today()
+    today = datetime.date(2009, 10, 21)
+    yesterday = today - datetime.timedelta(days=1)    
+
     end_xml_data = """  <license>K1XUXQVMDNCL.NS5T4Q79KLYCK07EK</license>
   <chart_type>Line</chart_type>
   <chart_value prefix="$" decimals="2" separator="," position="cursor" size="14" color="000000" background_color="FFD991" alpha="90" />
@@ -51,6 +163,7 @@ def generate_graph_pages(db, ids, directory):
     except OSError:
         pass
     for id in ids:
+        yesterday_cost = today_cost = None
         db.execute('select newegg_id from item where id = %s', id)
         newegg_id = cursor.fetchone()['newegg_id']
         db.execute(''.join(['SELECT date_added as date, original',
@@ -74,6 +187,19 @@ def generate_graph_pages(db, ids, directory):
             while rows[i]['date'].date() < cur_date:
                 i += 1
             row = rows[i]
+            
+            # Calculate drop score
+            if row['date'].date() == yesterday:
+                yesterday_cost = row['rebate'] + row['shipping']
+            elif row['date'].date() == today:
+                if yesterday_cost:
+                    today_cost = row['rebate'] + row['shipping']
+                    drop = yesterday_cost - today_cost
+                    if drop > 0:
+                        drop_percent = drop * 1.0 / yesterday_cost
+                        drop_score = drop_percent * drop
+                        drops.append((drop_score, id, drop, drop_percent,
+                                      today_cost))
 
 #             if cur_date.day == 1:  # list only months
             if len(data) % label_delta == 0: # list every label_delta dates
@@ -127,45 +253,10 @@ def generate_graph_pages(db, ids, directory):
         file = open(os.path.join(directory, '%s.html' % newegg_id), 'w')
         file.write(output)
         file.close()
+    return drops
 
 def generate_item_pages(db, ids, directory):
-    title_template = """<!DOCTYPE html
-PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<title>%s &raquo; priceTrackr</title>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="/layout.css" />
-<script type="text/javascript" src="/javascript.js"></script>
-</head>
-<body onload="document.getElementById('q').focus()">
-<div id="container">
-<div id="header">
-<table style="width:99%%">
-<!-- How can I do this without a table? -->
-<tr valign="bottom">
-<td><h1>priceTrackr</h1></td>
-<td style="text-align:right;padding-bottom:5px"><form method="get" action="/search/">
-    <div>
-      <input type="text" name="q" id="q" size="20" maxlength="100" />
-      <input type="submit" value="search" style="vertical-align:middle" />
-    </div>
-</form></td>
-</tr>
-</table>
-</div>
-<div id="menu">
-  <ul id="nav">
-    <li><a href="/">Home</a></li>
-    <li><a href="/faq/">FAQ</a></li>
-    <li><a href="/about/">About</a></li>
-  </ul>
-</div>
-"""
-    body_template = """<div id="content">
-<div class="itemName"><h4><a href="http://www.newegg.com/Product/Product.asp?Item=%s" onclick="javascript:pageTracker._trackPageview('/outgoing/newegg.com/%s');">%s</a></h4>
+    body_template = """<div class="itemName"><h4><a href="http://www.newegg.com/Product/Product.asp?Item=%s" onclick="javascript:pageTracker._trackPageview('/outgoing/newegg.com/%s');">%s</a></h4>
 <p>Model: %s</p></div>
 <div class="itemAdd">
 <script type="text/javascript"><!--
@@ -218,24 +309,7 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
   </tr>
 </table>
 <p>* Shipping is calculated to zip code 93117. Minimum shipping is the lowest nonzero shipping cost.</p>
-</div>
-<div id="footer">
-<div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
-</div>
-</div>
-<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%%3E%%3C/script%%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("UA-510348-5");
-pageTracker._setDomainName(".pricetrackr.com");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-</body>
-</html>"""
+"""
 
     try:
         os.mkdir(directory)
@@ -269,7 +343,7 @@ pageTracker._trackPageview();
                         row[key] != 0:
                     min[key] = row[key], row['update_date'].date()
 
-        output = title_template % current['title']
+        output = SITE_HEADER % (current['title'], '')
         output +=  body_template % (newegg_id, newegg_id, current['title'],
                                     current['model'], newegg_id, newegg_id)
         if min['shipping'][1]:
@@ -302,7 +376,7 @@ pageTracker._trackPageview();
                                     max['rebate'][1],
                                     current_shipping,
                                     shipping)
-
+        output += SITE_FOOTER
         file = open(os.path.join(directory, '%s.html' % newegg_id), 'w')
         file.write(output)
         file.close()
@@ -339,7 +413,8 @@ if __name__ == '__main__':
     if not filter_id:
         generate_sitemap(newegg_ids, '../nginx_root/')
         print "Sitemap complete"
-    generate_graph_pages(cursor, ids, '../nginx_root/graphs')
+    drops = generate_graph_pages(cursor, ids, '../nginx_root/graphs')
     print "Graph pages complete"
+    generate_daily_drops(cursor, drops, '../nginx_root/')
     generate_item_pages(cursor, ids, '../nginx_root/items')
     print "Item pages complete"
