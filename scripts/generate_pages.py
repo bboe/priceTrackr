@@ -327,7 +327,7 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
     <td>$%.2f on %s</td>
     <td>$%.2f on %s</td>
   </tr>
-  <tr style="background:#4E85AA">
+  <tr style="background:#4E85AA;color:#C8E9FF">
     <td>+ savings</td><td>$%.2f</td>
     <td>$%.2f on %s</td>
     <td>$%.2f on %s</td>
@@ -337,7 +337,7 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
     <td>$%.2f on %s</td>
     <td>$%.2f on %s</td>
   </tr>
-  <tr style="background:#AA5C4E">
+  <tr style="background:#AA5C4E;color:#C8E9FF">
     <td>shipping*</td>
     <td>%s</td>
     %s

@@ -28,12 +28,15 @@ if ($data = $Cache_Lite->get($id)) {
   <li><a href="#0">Why create priceTrackr?</a></li>
   <li><a href="#1">Why are there holes for some dates in the charts?</a></li>
   <li><a href="#2">How should the charts be interpreted?</a></li>
+  <li><a href="#3">How is the daily drops page sorted?</a></li>
+  <li><a href="#4">What does priceTrackr use to make the awesome charts?</a></li>
 </ol>
 
 <div class="faq">
   <h4><a name="0"></a>Why create priceTrackr?</h4>
   <div class="answer">
-    <p>priceTrackr was created so that one can make a more informed decision before purchasing items on newegg.</p>
+    <p>priceTrackr was created so that one can make a more informed decision
+      before purchasing items on Newegg.</p>
   </div>
 </div>
 
@@ -69,6 +72,27 @@ if ($data = $Cache_Lite->get($id)) {
       variations in the shipping price as is.</p>
   </div>
 </div>
+
+<div class="faq">
+  <h4><a name="3"></a>How is the daily drops page sorted?</h4>
+  <div class="answer">
+    <p>The daily drops page is sorted in descending order based on the computed
+      drop score each item receives. The drop score is computed by taking the
+      cost drop of an item (yesterday's price - today's price) and multiplying
+      that with the percent drop of an item (cost drop / yesterday's
+      price).</p>
+  </div>
+</div>
+
+<div class="faq">
+  <h4><a name="4"></a>What does priceTrackr use to make the awesome charts?</h4>
+  <div class="answer">
+    <p>priceTrackr uses <a href="http://www.maani.us/charts4/">XML/SWF
+	Charts</a> version 4.7 to make the awesome charts.</p>
+  </div>
+</div>
+
+
 <?php
 require_once 'includes/footer.php';
 $data = ob_get_flush();
