@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import datetime, math, os, sys
+import datetime, math, os, re, sys
 import MySQLdb
 import sitemap_gen
 
@@ -11,6 +11,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <title>%s &raquo; priceTrackr</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <link rel="shortcut icon" href="/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/daily.xml" />
 <link rel="stylesheet" type="text/css" href="/layout.css" />
 <script type="text/javascript" src="/javascript.js"></script>
 </head>
@@ -70,6 +71,27 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
 </div>
 """
 
+RSS_TEMPLATE = """<?xml version="1.0"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>priceTrackr Daily Drops</title>
+    <link>http://www.pricetrackr.com/daily/</link>
+    <atom:link href="http://www.pricetrackr.com/daily.xml" rel="self" type="application/rss+xml" />
+    <description>Daily list of items which have dropped the most according to
+      priceTrackr's score function. The score function is computed as
+      the drop percent multiplied by the drop value.</description>
+    <language>en-us</language>
+    <lastBuildDate>%s</lastBuildDate>
+%s
+  </channel>
+</rss>
+"""
+
+DATE_822 = datetime.datetime.now().strftime('%a, %d %b %Y %H:%M:%S PST')
+
+
+def strip_tags(data):
+    return re.compile(r'<.*?>').sub('', data)
 
 
 def generate_sitemap(newegg_ids, directory):
@@ -104,28 +126,41 @@ def generate_sitemap(newegg_ids, directory):
 
 def generate_daily_drops(db, drops, directory):
     output_html = 'daily.html'
+    output_rss = 'daily.xml'
     
-    output = SITE_HEADER % ('Daily Drops', ' class="active"')
-    output += '<h1>Daily Drops</h1>\n\n'
+    html = SITE_HEADER % ('Daily Drops', ' class="active"')
+    html += '<h1>Daily Drops</h1>\n\n'
+    xml = ''
 
     i = 0
     for score, id, drop, percent, total in sorted(drops, reverse=True)[:50]:
         i += 1
         db.execute('SELECT title, newegg_id from item where item.id = %s', id)
         row = cursor.fetchone()
-        output += '<p><a href="/i/%s/">%s</a><br/>\n' % (row['newegg_id'],
-                                                            row['title'])
-        output += ' '.join(['Drop Value: <strong>$%.2f</strong>',
-                            'Drop Percent: <strong>%.0f%%</strong>',
-                            'Current Cost: <strong>$%.2f</strong></p>\n']) \
-                            % (drop / 100., percent * 100., total / 100.)
+        title = row['title'].replace('& ', '&amp; ')
+        line = ' '.join(['Drop Value: <strong>$%.2f</strong>',
+                         'Drop Percent: <strong>%.0f%%</strong>',
+                         'Current Cost: <strong>$%.2f</strong>']) \
+                         % (drop / 100., percent * 100., total / 100.)
+        html += '<p><a href="/i/%s/">%s</a><br/>%s</p>\n' % (row['newegg_id'],
+                                                             title, line)
+        xml += '    <item>\n      <title>%s</title>\n' % title
+        xml += '      <link>http://www.pricetrackr.com/i/%s/</link>\n' \
+            % row['newegg_id']
+        xml += '      <description>%s</description>\n' % strip_tags(line)
+        xml += '      <guid isPermaLink="false">%s%s</guid>\n' % (id, DATE_822)
+        xml += '      <pubDate>%s</pubDate>\n    </item>' % DATE_822
         
         if i % 10 == 0:
-            output += ITEM_ADD
+            html += ITEM_ADD
 
-    output += SITE_FOOTER
+    out_file = open(os.path.join(directory, output_rss), 'w')
+    out_file.write(RSS_TEMPLATE % (DATE_822, xml))
+    out_file.close()
+
+    html += SITE_FOOTER
     out_file = open(os.path.join(directory, output_html), 'w')
-    out_file.write(output)
+    out_file.write(html)
     out_file.close()    
 
 def generate_graph_pages(db, ids, directory):
