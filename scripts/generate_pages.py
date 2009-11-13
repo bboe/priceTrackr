@@ -75,7 +75,7 @@ google_ad_client = "pub-0638295794514727";google_ad_slot = "9316902769";google_a
 def generate_sitemap(newegg_ids, directory):
     sitemap = 'sitemap.xml.gz'
     lastmod = datetime.date.today().__str__()
-    sm = sitemap_gen.Sitemap(False)
+    sm = sitemap_gen.Sitemap(True)
     sm._base_url = 'http://www.pricetrackr.com/'
     sm._filegen = sitemap_gen.FilePathGenerator()
     sm._filegen.Preload(sitemap)
@@ -131,8 +131,8 @@ def generate_daily_drops(db, drops, directory):
 def generate_graph_pages(db, ids, directory):
     """Returns list of (drop_score, id, drop, drop_percent, current_total)"""
     drops = []
-    #today = datetime.date.today()
-    today = datetime.date(2009, 10, 21)
+    today = datetime.date.today()
+    #today = datetime.date(2009, 10, 21)
     yesterday = today - datetime.timedelta(days=1)    
 
     end_xml_data = """  <license>K1XUXQVMDNCL.NS5T4Q79KLYCK07EK</license>
