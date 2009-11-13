@@ -1,4 +1,4 @@
-body{padding:5px;background:#3B6480;color:#222;text-align:center;font:85% "Trebuchet MS",Arial,sans-serif}
+body{padding:5px;background:#3B6480;color:#222;text-align:center;font:85% "Trebuchet MS",Arial,"Lucida Sans",Verdana,sans-serif}
 h1,h2,h3,h4{margin:0;padding:0 10px;font-weight:normal}
 h1{font-size:250%;font-family:impact,sans-serif;letter-spacing:0}
 h2{font-size:180%}
@@ -26,7 +26,6 @@ p, dl{font-size:100%;margin:0 10px 10px 20px;}
 .results a{font-weight:normal}
 div.faq{margin-bottom:10px}
 .mesg{color:#F00;margin:0 10px 0 20px;font-size:80%}
-.itemName h4{font-family:"Trebuchet MS",Arial,sans-serif}
 .itemName p{margin-left:10px}
 table.stats{padding:10px;width:100%;text-align:center;font-size:95%}
 .min{color:#00F}
