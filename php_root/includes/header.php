@@ -13,6 +13,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <title><?php require_once 'title.php'?> &raquo; priceTrackr</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <link rel="shortcut icon" href="/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/daily.xml" />
 <link rel="stylesheet" type="text/css" href="/layout.css" />
 <script type="text/javascript" src="/javascript.js"></script>
 </head>
