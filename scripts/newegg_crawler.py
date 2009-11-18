@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import crawle, cPickle, time, gzip, os, re, sys, threading
+import crawle, cPickle, gzip, os, re, sys, tarfile, threading, time
 from optparse import OptionParser
 from StringIO import StringIO
 from page_parser import PageParser
@@ -11,10 +11,10 @@ class NewEggCrawler(object):
     ITEM_ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                      'Product.aspx\?Item=([A-Z0-9]+)']))
 
-    def __init__(self, output_prefix, save):
+    def __init__(self, output_tar, error_tar, save):
         self.item_ids = []
         self.get_product_ids()
-        self.handler = NewEggCrawlHandler(output_prefix, save)
+        self.handler = NewEggCrawlHandler(output_tar, error_tar, save)
         self.queue = crawle.URLQueue()
 
     def get_product_ids(self):
@@ -57,39 +57,41 @@ class NewEggCrawlHandler(crawle.Handler):
     def transform_id(id):
         return '%s-%s-%s' % (id[7:9], id[9:12], id[12:])
     
-    def __init__(self, output_prefix, save):
+    def __init__(self, output_tar, error_tar, save):
         self.save = save
-        self.working_dir = './%s' % output_prefix
-        self.error_dir = './%s_errors' % output_prefix
+        self.output_tar = output_tar
+        self.error_tar = error_tar
         self.parser = PageParser()
         self.lock = threading.Lock()
         self.items = {}
 
     def handle_error(self, rr):
         if not self.save: return
+        temp_file = StringIO()
+        cPickle.dump(rr, temp_file, cPickle.HIGHEST_PROTOCOL)
+        temp_file.seek(0)
+        info = tarfile.TarInfo('error/%s-%s' % rr.requestURL)
+        info.size = len(temp_file.buf)
+        info.mtime = time.time()
         self.lock.acquire()
-        if not os.path.exists(self.error_dir):
-            os.mkdir(self.error_dir)
+        self.error_tar.members = []
+        self.error_tar.addfile(info, temp_file)
         self.lock.release()
-        path = os.path.join(self.error_dir, '%s_%s' % rr.requestURL)
-        if os.path.exists(path):
-            print 'Already errored: %s - %s' % rr.requestURL
-            return False
-        output = open(path, 'w')
-        cPickle.dump(rr, output, cPickle.HIGHEST_PROTOCOL)
-        output.close()
-        return True
+        temp_file.close()
     
     def save_page(self, rr):
         if not self.save: return
+        temp_file = StringIO()
+        cPickle.dump(rr, temp_file, cPickle.HIGHEST_PROTOCOL)
+        temp_file.seek(0)
+        info = tarfile.TarInfo('pages/%s-%s' % rr.requestURL)
+        info.size = len(temp_file.buf)
+        info.mtime = time.time()
         self.lock.acquire()
-        if not os.path.exists(self.working_dir):
-            os.mkdir(self.working_dir)
+        self.output_tar.members = []
+        self.output_tar.addfile(info, temp_file)
         self.lock.release()
-        path = os.path.join(self.working_dir, '%s_%s.html' % rr.requestURL)
-        output = open(path, 'w')
-        output.write(rr.responseBody)
-        output.close()
+        temp_file.close()
 
     def preProcess(self, rr):
         if not isinstance(rr.requestURL, tuple):
@@ -166,8 +168,13 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
 
     output_prefix = time.strftime('%Y-%m-%d_%H.%M.%S', time.localtime())
+    if options.no_save:
+        output_tar = error_tar = None
+    else:
+        output_tar = tarfile.open('%s.tar.gz' % output_prefix, 'w:gz')
+        error_tar = tarfile.open('%s_error.tar.gz' % output_prefix, 'w:gz')
       
-    crawler = NewEggCrawler(output_prefix, not options.no_save)
+    crawler = NewEggCrawler(output_tar, error_tar, not options.no_save)
     if options.item != None:
         crawler.item_ids = options.item
 
@@ -183,10 +190,13 @@ if __name__ == '__main__':
         pprint.pprint(crawler.handler.items)
         sys.exit(1)
 
+
+    print 'Creating pickle file'
     output = open('%s.pkl' % output_prefix, 'w')
     cPickle.dump(crawler.handler.items, output, cPickle.HIGHEST_PROTOCOL)
     output.close()
 
-    if not os.system('tar -czf %s.tar.gz %s/' %
-                     (output_prefix, output_prefix)):
-        os.system('rm -rf %s/' % output_prefix)    
+    output_tar.close()
+    error_tar.close()
+    if len(error_tar.members) == 0:
+        os.remove('%s_error.tar.gz' % output_prefix)
