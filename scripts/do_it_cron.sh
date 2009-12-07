@@ -15,8 +15,7 @@ pt_path=src/priceTrackr/scripts
 key=/home/bryce/.ssh/ptrackr.priv
 
 # Perform crawl
-#ssh $host1 -i $key "mkdir $temp_path && cd $temp_path && ../priceTrackr/newegg_crawler.py --threads 4"
-echo "skipping crawl"
+ssh $host1 -i $key "mkdir $temp_path && cd $temp_path && ../priceTrackr/newegg_crawler.py --threads 4"
 if [ $? -ne 0 ]
 then
     echo "Crawl failed"
@@ -63,6 +62,15 @@ then
     echo "Could not delete pkl file"
     exit 1
 fi
+
+# Generate pages on webserver
+ssh pricetrackr -i $key "pt_path/generate_pages.py"
+if [ $? -ne 0 ]
+then
+    echo "Could not generate pages"
+    exit 1
+fi
+
 
 echo "Finished: `date`"
 echo
