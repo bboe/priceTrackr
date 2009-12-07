@@ -446,10 +446,10 @@ if __name__ == '__main__':
     print 'Found %d items' % len(ids)
 
     if not filter_id:
-        generate_sitemap(newegg_ids, '../nginx_root/')
+        generate_sitemap(newegg_ids, '/home/bryce/src/priceTrackr/nginx_root/')
         print "Sitemap complete"
-    drops = generate_graph_pages(cursor, ids, '../nginx_root/graphs')
+    drops = generate_graph_pages(cursor, ids, '/home/bryce/src/priceTrackr/nginx_root/graphs')
     print "Graph pages complete"
-    generate_daily_drops(cursor, drops, '../nginx_root/')
-    generate_item_pages(cursor, ids, '../nginx_root/items')
+    generate_daily_drops(cursor, drops, '/home/bryce/src/priceTrackr/nginx_root/')
+    generate_item_pages(cursor, ids, '/home/bryce/src/priceTrackr/nginx_root/items')
     print "Item pages complete"
