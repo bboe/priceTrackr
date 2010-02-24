@@ -64,7 +64,7 @@ then
 fi
 
 # Generate pages on webserver
-ssh pricetrackr -i $key "pt_path/generate_pages.py"
+ssh pricetrackr -i $key "$pt_path/generate_pages.py"
 if [ $? -ne 0 ]
 then
     echo "Could not generate pages"
