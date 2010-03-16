@@ -86,11 +86,14 @@ class ItemHistoryHelper(object):
                    (self.to_num(), self.id, date, self.title, self.model))
 
     def update_history(self, db, date):
+      try:
         db.execute(''.join(['insert into item_history (id, date_added, ',
                             'original, price, rebate, shipping) VALUES',
                             '(%s, %s, %s, %s, %s, %s)']),
                    (self.to_num(), date, self.original, self.price,
                     self.rebate, self.shipping))
+      except MySQLdb.IntegrityError, e:
+          print e
 
 
 if __name__ == '__main__':
@@ -131,6 +134,9 @@ if __name__ == '__main__':
         except Exception, e:
             if e.args == ('Incomplete Item',): continue
             else: raise
+        if i.title == None:
+            print 'No title: %s' % id
+            continue
         i.verify_savings()
         i.verify_text()
         if id not in ids:
