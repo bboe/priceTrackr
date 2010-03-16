@@ -44,7 +44,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 SITE_FOOTER = """</div>
 <div id="footer">
-<div class="copyright">&copy; 2009 priceTrackr.  All Rights Reserved</div>
+<div class="copyright">&copy; 2010 priceTrackr.  All Rights Reserved</div>
 </div>
 </div>
 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
