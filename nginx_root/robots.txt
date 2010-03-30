@@ -3,4 +3,4 @@ User-agent: *
 Disallow: /g/
 Disallow: /search/
 
-Sitemap: http://www.pricetrackr.com/sitemap.xml.gz
+Sitemap: http://www.pricetrackr.com/pt_sitemap_index.xml

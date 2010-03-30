@@ -95,12 +95,12 @@ def strip_tags(data):
 
 
 def generate_sitemap(newegg_ids, directory):
-    sitemap = 'sitemap.xml.gz'
+    sitemap_prefix = 'pt_sitemap'
     lastmod = datetime.date.today().__str__()
     sm = sitemap_gen.Sitemap(True)
     sm._base_url = 'http://www.pricetrackr.com/'
     sm._filegen = sitemap_gen.FilePathGenerator()
-    sm._filegen.Preload(sitemap)
+    sm._filegen.Preload('%s.xml.gz' % sitemap_prefix)
     sm._wildurl1 = sm._filegen.GenerateWildURL(sm._base_url)
     sm._wildurl2 = sm._filegen.GenerateURL(sitemap_gen.SITEINDEX_SUFFIX,
                                            sm._base_url)
@@ -122,7 +122,7 @@ def generate_sitemap(newegg_ids, directory):
     
     
     sm.Generate()
-    os.rename(sitemap, os.path.join(directory, sitemap))
+    os.system('mv %s* %s/' % (sitemap_prefix, directory))
 
 def generate_daily_drops(db, drops, directory):
     output_html = 'daily.html'
@@ -206,6 +206,9 @@ def generate_graph_pages(db, ids, directory):
                             'history where id = %s order by date']),
                            id)
         rows = cursor.fetchall()
+        if len(rows) == 0:
+            print 'No tracker data: %d' % id
+            continue
 
         data = []
         max_axis = 0

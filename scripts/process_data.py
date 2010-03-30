@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import cPickle, os, re, string, sys, time
+import cPickle, os, re, string, sys, time, warnings
 import MySQLdb
 
 class ItemHistoryHelper(object):
@@ -45,7 +45,7 @@ class ItemHistoryHelper(object):
             self.rebate = self.price - self.convert_price(item['rebate'])
         else:
             self.rebate = self.price
-        if 'shipping' not in item:
+        if 'shipping' not in item or not item['shipping']:
             self.shipping = 0
         else:
             self.shipping = self.convert_price(item['shipping'])
@@ -53,11 +53,15 @@ class ItemHistoryHelper(object):
     def verify_text(self):
         if len(self.title) > 512:
             print 'Title too long: %s' % self.id
+            return False
         if len(self.model) > 256:
             print 'Model too long: %s' % self.id
+            return False
         match = self.ID_RE.match(self.id)
         if not match or int(match.group(1)) > 2**28-1:
-            print 'Unknown ID: %s' % self.id, self.id[15:]
+            print 'Unknown ID: %s' % self.id
+            return False
+        return True
         #else: print match.groups()
 
     def to_num(self):
@@ -79,6 +83,8 @@ class ItemHistoryHelper(object):
     def verify_savings(self):
         if self.original - self.save != self.price:
             print 'Savings Mismatch: %s' % self.id
+            return False
+        return True
 
     def add_item(self, db, date):
         db.execute(''.join(['insert into item (id, newegg_id, date_added, ',
@@ -86,15 +92,19 @@ class ItemHistoryHelper(object):
                    (self.to_num(), self.id, date, self.title, self.model))
 
     def update_history(self, db, date):
-      try:
-        db.execute(''.join(['insert into item_history (id, date_added, ',
-                            'original, price, rebate, shipping) VALUES',
-                            '(%s, %s, %s, %s, %s, %s)']),
-                   (self.to_num(), date, self.original, self.price,
-                    self.rebate, self.shipping))
-      except MySQLdb.IntegrityError, e:
-          print e
-
+        try:
+            db.execute(''.join(['insert into item_history (id, date_added, ',
+                                'original, price, rebate, shipping) VALUES',
+                                '(%s, %s, %s, %s, %s, %s)']),
+                       (self.to_num(), date, self.original, self.price,
+                        self.rebate, self.shipping))
+        except MySQLdb.IntegrityError, e:
+            if 'Duplicate' not in e[1]:
+                print e
+        except MySQLdb.Warning, e:
+            print 'blah'
+            print item
+            raise
 
 if __name__ == '__main__':
     def usage(msg=None):
@@ -118,6 +128,7 @@ if __name__ == '__main__':
     file = os.path.basename(file)
     date = file.strip('.pkl').replace('.', ':').replace('_', ' ')
 
+    warnings.simplefilter("error", MySQLdb.Warning)
     conn = MySQLdb.connect(user='pt_user', passwd='pritshiz',
                            db='priceTrackr')
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
@@ -137,8 +148,8 @@ if __name__ == '__main__':
         if i.title == None:
             print 'No title: %s' % id
             continue
-        i.verify_savings()
-        i.verify_text()
+        if not (i.verify_savings() and i.verify_text()):
+            continue
         if id not in ids:
             i.add_item(cursor, date)
         i.update_history(cursor, date)
