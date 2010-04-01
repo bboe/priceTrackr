@@ -101,10 +101,10 @@ class ItemHistoryHelper(object):
         except MySQLdb.IntegrityError, e:
             if 'Duplicate' not in e[1]:
                 print e
+                print item
         except MySQLdb.Warning, e:
-            print 'blah'
+            print e
             print item
-            raise
 
 if __name__ == '__main__':
     def usage(msg=None):
