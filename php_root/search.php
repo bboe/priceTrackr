@@ -13,7 +13,7 @@ else $q = trim($_GET['q']);
 <h1>Search</h1>
 <form method="get" action="/search/">
   <p>
-  <input type="text" name="q" id="searchInput" value="<?=$q?>" size="48" maxlength="100" />
+  <input type="text" name="q" id="searchInput" value="<?=htmlspecialchars($q)?>" size="48" maxlength="100" />
   <input type="submit" alt="Submit" style="vertical-align:middle" value="Search"/>
   </p>
 </form>
