@@ -11,7 +11,7 @@ echo "Starting: `date`"
 host1=bboe@$1.cs.ucsb.edu
 temp_path=seclab/cron_temp
 archive_path=/home/bryce/svn/priceTrackr/ARCHIVE/
-pt_path=src/priceTrackr/scripts
+pt_path=svn/priceTrackr/scripts
 key=/home/bryce/.ssh/ptrackr.priv
 
 # Perform crawl
@@ -32,7 +32,7 @@ fi
 
 # Copy pkl file to webserver
 filename=`ls -tr $archive_path/*.pkl | tail -n 1`
-scp -i $key $filename pricetrackr:src/priceTrackr/scripts
+scp -i $key $filename pricetrackr:$pt_path
 if [ $? -ne 0 ]
 then
     echo "SCP data to remote failed"
