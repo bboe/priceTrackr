@@ -3,6 +3,8 @@ import datetime, math, os, re, sys
 import MySQLdb
 import sitemap_gen
 
+BASE_PATH = '/home/bryce/svn/priceTrackr/nginx_root/'
+
 SITE_HEADER = """<!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -449,10 +451,11 @@ if __name__ == '__main__':
     print 'Found %d items' % len(ids)
 
     if not filter_id:
-        generate_sitemap(newegg_ids, '/home/bryce/src/priceTrackr/nginx_root/')
+        generate_sitemap(newegg_ids, BASE_PATH)
         print "Sitemap complete"
-    drops = generate_graph_pages(cursor, ids, '/home/bryce/src/priceTrackr/nginx_root/graphs')
+    drops = generate_graph_pages(cursor, ids,
+                                 os.path.join(BASE_PATH, 'graphs'))
     print "Graph pages complete"
-    generate_daily_drops(cursor, drops, '/home/bryce/src/priceTrackr/nginx_root/')
-    generate_item_pages(cursor, ids, '/home/bryce/src/priceTrackr/nginx_root/items')
+    generate_daily_drops(cursor, drops, BASE_PATH)
+    generate_item_pages(cursor, ids, os.path.join(BASE_PATH, 'items'))
     print "Item pages complete"
