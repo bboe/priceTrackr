@@ -15,7 +15,7 @@ pt_path=svn/priceTrackr/scripts
 key=/home/bryce/.ssh/ptrackr.priv
 
 # Perform crawl
-ssh $host1 -i $key "mkdir $temp_path && cd $temp_path && ../priceTrackr/newegg_crawler.py --threads 4"
+ssh $host1 -i $key "rm -rf $temp_path && mkdir $temp_path && cd $temp_path && ../priceTrackr/newegg_crawler.py --threads 4"
 if [ $? -ne 0 ]
 then
     echo "Crawl failed"
