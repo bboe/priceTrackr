@@ -10,9 +10,9 @@ echo "Starting: `date`"
 
 host1=bboe@$1.cs.ucsb.edu
 temp_path=seclab/cron_temp
-archive_path=/home/bryce/svn/priceTrackr/ARCHIVE/
+archive_path=~/svn/priceTrackr/ARCHIVE/
 pt_path=svn/priceTrackr/scripts
-key=/home/bryce/.ssh/ptrackr.priv
+key=~/.ssh/ptrackr.priv
 
 # Perform crawl
 ssh $host1 -i $key "rm -rf $temp_path && mkdir $temp_path && cd $temp_path && ../priceTrackr/newegg_crawler.py --threads 4"
