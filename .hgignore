@@ -1,0 +1,8 @@
+syntax: glob
+
+ARCHIVE
+nginx_root/daily*
+nginx_root/google*.html
+nginx_root/pt_*
+nginx_root/graphs/*
+nginx_root/items/*
