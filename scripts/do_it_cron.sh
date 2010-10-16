@@ -10,8 +10,8 @@ echo "Starting: `date`"
 
 host1=bboe@$1.cs.ucsb.edu
 temp_path=seclab/cron_temp
-archive_path=~/svn/priceTrackr/ARCHIVE/
-pt_path=svn/priceTrackr/scripts
+archive_path=~/hg/priceTrackr/ARCHIVE/
+pt_path=hg/priceTrackr/scripts
 key=~/.ssh/ptrackr.priv
 
 # Perform crawl

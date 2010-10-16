@@ -3,7 +3,7 @@ import datetime, math, os, re, sys
 import MySQLdb
 import sitemap_gen
 
-BASE_PATH = '/home/bryce/svn/priceTrackr/nginx_root/'
+BASE_PATH = '/home/bryce/hg/priceTrackr/nginx_root/'
 
 SITE_HEADER = """<!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
