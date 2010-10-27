@@ -32,7 +32,7 @@ fi
 
 # Copy pkl file to webserver
 filename=`ls -tr $archive_path/*.pkl | tail -n 1`
-scp -i $key $filename pricetrackr:$pt_path
+scp -i $key $filename pricetrackr.com:$pt_path
 if [ $? -ne 0 ]
 then
     echo "SCP data to remote failed"
@@ -48,7 +48,7 @@ then
 fi
 
 # Insert data into database
-ssh pricetrackr -i $key "cd $pt_path && ./process_data.py *.pkl"
+ssh pricetrackr.com -i $key "cd $pt_path && ./process_data.py *.pkl"
 if [ $? -ne 0 ]
 then
     echo "Could not import data"
@@ -56,7 +56,7 @@ then
 fi
 
 # Remove file on webserver
-ssh pricetrackr -i $key "rm $pt_path/*.pkl"
+ssh pricetrackr.com -i $key "rm $pt_path/*.pkl"
 if [ $? -ne 0 ]
 then
     echo "Could not delete pkl file"
@@ -64,7 +64,7 @@ then
 fi
 
 # Generate pages on webserver
-ssh pricetrackr -i $key "$pt_path/generate_pages.py"
+ssh pricetrackr.com -i $key "$pt_path/generate_pages.py"
 if [ $? -ne 0 ]
 then
     echo "Could not generate pages"
