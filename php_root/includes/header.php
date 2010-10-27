@@ -1,5 +1,6 @@
 <?php
 if(!(defined('START') && START)) exit('Not A Valid Entry Point');
+error_reporting(E_ALL ^ E_DEPRECATED);
 require_once('includes/myDB.php');
 require_once("includes/functions.php");
 if (!isset($db)) $db = new myDB();

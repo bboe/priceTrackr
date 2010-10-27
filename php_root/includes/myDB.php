@@ -8,7 +8,7 @@ class myDB {
     $dsn = 'mysqli://pt_user:pritshiz@localhost/priceTrackr';
     $options = array('debug' => 2, 'result_buffering' => false);
     $this->db =& MDB2::factory($dsn, $options);
-    
+
     if (PEAR::isError($this->db)) {
       // TODO: This should display the footer
       die('Sorry the page could not be processed at this time.');
