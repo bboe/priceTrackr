@@ -25,7 +25,10 @@ class NewEggCrawler(object):
                         in self.SITEMAPS]:
             cc = crawle.HTTPConnectionControl(crawle.Handler())
             rr = crawle.RequestResponse(sitemap, redirects=None)
-            cc.request(rr)
+            try:
+                cc.request(rr)
+            except socket.error:
+                sys.exit(1)
             if rr.response_status != 200:
                 print 'Error'
                 break
@@ -99,7 +102,6 @@ class NewEggCrawlHandler(crawle.Handler):
     def pre_process(self, rr):
         if not isinstance(rr.request_url, tuple):
             print 'Something slid by: %s' % rr.response_url
-            raise
         id, type = rr.request_url
         if type == 0: # ITEM
             rr.response_url = ''.join([self.ITEM_URL_PREFIX, id])
