@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import crawle, cPickle, gzip, os, re, sys, tarfile, threading, time
+import crawle, cPickle, gzip, os, re, socket, sys, tarfile, threading, time
 from optparse import OptionParser
 from StringIO import StringIO
 from page_parser import PageParser
@@ -7,7 +7,10 @@ from page_parser import PageParser
 class NewEggCrawler(object):
     SITEMAP_URL_PREFIX = 'http://www.newegg.com/Sitemap/USA/'
     SITEMAPS = ['newegg_sitemap_product01.xml.gz',
-                'newegg_sitemap_product02.xml.gz']
+                'newegg_sitemap_product02.xml.gz',
+                'newegg_sitemap_product03.xml.gz',
+                'newegg_sitemap_product04.xml.gz',
+                'newegg_sitemap_product05.xml.gz']
     ITEM_ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                      'Product.aspx\?Item=([A-Z0-9]+)']))
 
@@ -93,7 +96,7 @@ class NewEggCrawlHandler(crawle.Handler):
         self.lock.release()
         temp_file.close()
 
-    def preProcess(self, rr):
+    def pre_process(self, rr):
         if not isinstance(rr.request_url, tuple):
             print 'Something slid by: %s' % rr.response_url
             raise
@@ -113,9 +116,9 @@ class NewEggCrawlHandler(crawle.Handler):
     def process(self, rr, queue):
         if rr.response_status == None:
             try:
-                if rr.errorMsg == 'Socket Error':
+                if isinstance(rr.error, socket.error):
                     queue.put(rr.request_url)
-                elif rr.errorMsg == 'Redirect count exceeded':
+                elif isinstance(rr.error, crawle.CrawleRedirectsExceeded):
                     pass
                 else:
                     self.handle_error(rr)
