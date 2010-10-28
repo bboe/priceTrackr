@@ -39,7 +39,7 @@ else {
   print '<p class="searchTime">Search took: '. round($time,1) . ' milliseconds</p>';
   $size = sizeof($result);
   if ($size == 0) {
-    print '<p>No results found. Please <a href="/contact/">contact us</a> if you believe priceTrackr is missing something.</p>';
+    print '<p>No results found.</p>';
   }
   else if ($size == 1) {
     header('Location: /i/'.$result[0]['newegg_id'].'/');
