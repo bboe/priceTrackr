@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import crawle, cPickle, gzip, os, re, sys, tarfile, threading, time
+import crawle, cPickle, gzip, os, re, socket, sys, tarfile, threading, time
 from optparse import OptionParser
 from StringIO import StringIO
 from page_parser import PageParser
@@ -7,7 +7,10 @@ from page_parser import PageParser
 class NewEggCrawler(object):
     SITEMAP_URL_PREFIX = 'http://www.newegg.com/Sitemap/USA/'
     SITEMAPS = ['newegg_sitemap_product01.xml.gz',
-                'newegg_sitemap_product02.xml.gz']
+                'newegg_sitemap_product02.xml.gz',
+                'newegg_sitemap_product03.xml.gz',
+                'newegg_sitemap_product04.xml.gz',
+                'newegg_sitemap_product05.xml.gz']
     ITEM_ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                      'Product.aspx\?Item=([A-Z0-9]+)']))
 
@@ -22,11 +25,14 @@ class NewEggCrawler(object):
                         in self.SITEMAPS]:
             cc = crawle.HTTPConnectionControl(crawle.Handler())
             rr = crawle.RequestResponse(sitemap, redirects=None)
-            cc.request(rr)
-            if rr.responseStatus != 200:
+            try:
+                cc.request(rr)
+            except socket.error:
+                sys.exit(1)
+            if rr.response_status != 200:
                 print 'Error'
                 break
-            body = gzip.GzipFile(fileobj=StringIO(rr.responseBody)).read()
+            body = gzip.GzipFile(fileobj=StringIO(rr.response_body)).read()
             self.item_ids.extend(self.ITEM_ID_RE.findall(body))
 
     def do_crawl(self, limit=None, start=0, threads=1):
@@ -35,7 +41,7 @@ class NewEggCrawler(object):
         for item_id in self.item_ids[start:]:
             self.queue.put((item_id, 0))
         controller = crawle.Controller(handler=self.handler, queue=self.queue,
-                                       numThreads=threads)
+                                       num_threads=threads)
         controller.start()
         try:
             controller.join()
@@ -70,7 +76,7 @@ class NewEggCrawlHandler(crawle.Handler):
         temp_file = StringIO()
         cPickle.dump(rr, temp_file, cPickle.HIGHEST_PROTOCOL)
         temp_file.seek(0)
-        info = tarfile.TarInfo('error/%s-%s' % rr.requestURL)
+        info = tarfile.TarInfo('error/%s-%s' % rr.request_url)
         info.size = len(temp_file.buf)
         info.mtime = time.time()
         self.lock.acquire()
@@ -84,7 +90,7 @@ class NewEggCrawlHandler(crawle.Handler):
         temp_file = StringIO()
         cPickle.dump(rr, temp_file, cPickle.HIGHEST_PROTOCOL)
         temp_file.seek(0)
-        info = tarfile.TarInfo('pages/%s-%s' % rr.requestURL)
+        info = tarfile.TarInfo('pages/%s-%s' % rr.request_url)
         info.size = len(temp_file.buf)
         info.mtime = time.time()
         self.lock.acquire()
@@ -93,52 +99,51 @@ class NewEggCrawlHandler(crawle.Handler):
         self.lock.release()
         temp_file.close()
 
-    def preProcess(self, rr):
-        if not isinstance(rr.requestURL, tuple):
-            print 'Something slid by: %s' % rr.responseURL
-            raise
-        id, type = rr.requestURL
+    def pre_process(self, rr):
+        if not isinstance(rr.request_url, tuple):
+            print 'Something slid by: %s' % rr.response_url
+        id, type = rr.request_url
         if type == 0: # ITEM
-            rr.responseURL = ''.join([self.ITEM_URL_PREFIX, id])
+            rr.response_url = ''.join([self.ITEM_URL_PREFIX, id])
         elif type == 1: # CART
-            rr.responseURL = self.CART_URL
+            rr.response_url = self.CART_URL
             c_id = ''.join(['NV%5FNEWEGGCOOKIE=#4{"Sites":{"USA":{"Values":{"',
                             self.transform_id(id), '":"1"}}}}'])
-            rr.requestHeaders = {'Cookie':';'.join([self.ZIP_COOKIE, c_id])}
+            rr.request_headers = {'Cookie':';'.join([self.ZIP_COOKIE, c_id])}
         elif type == 2: # MAPPING
-            rr.responseURL = ''.join([self.MAP_URL_PREFIX, id])
+            rr.response_url = ''.join([self.MAP_URL_PREFIX, id])
         else:
             raise 'Unknown Type'
 
     def process(self, rr, queue):
-        if rr.responseStatus == None:
+        if rr.response_status == None:
             try:
-                if rr.errorMsg == 'Socket Error':
-                    queue.put(rr.requestURL)
-                elif rr.errorMsg == 'Redirect count exceeded':
+                if isinstance(rr.error, socket.error):
+                    queue.put(rr.request_url)
+                elif isinstance(rr.error, crawle.CrawleRedirectsExceeded):
                     pass
                 else:
                     self.handle_error(rr)
             except:
                 self.handle_error(rr)
             return
-        elif rr.responseStatus != 200:
+        elif rr.response_status != 200:
             self.handle_error(rr)
             return
-        id, type = rr.requestURL
+        id, type = rr.request_url
         if type == 0: # ITEM
-            info = self.parser.parse_item_page_info(id, rr.responseBody)
+            info = self.parser.parse_item_page_info(id, rr.response_body)
             if not info:
                 return
             if 'deactivated' not in info and 'price' not in info:
                 queue.put((id, 1))
         elif type == 1: # CART
-            info = self.parser.parse_cart_page(id, rr.responseBody)
+            info = self.parser.parse_cart_page(id, rr.response_body)
             if not info:
                 queue.put((id, 2))
                 return
         elif type == 2: # MAPPING
-            info = self.parser.parse_mapping_page(id, rr.responseBody)
+            info = self.parser.parse_mapping_page(id, rr.response_body)
         else:
             raise 'Unknown Type'
         self.lock.acquire()
@@ -179,11 +184,20 @@ if __name__ == '__main__':
         crawler.item_ids = options.item
 
     print 'Found %d items' % len(crawler.item_ids)
-    if options.count:
-        sys.exit(0)
 
-    crawler.do_crawl(limit=options.limit, start=options.start,
-                     threads=options.threads)
+    try:
+        if options.count:
+            sys.exit(0)
+        else:
+            crawler.do_crawl(limit=options.limit, start=options.start,
+                             threads=options.threads)
+    finally:
+        output_tar.close()
+        error_tar.close()
+        if len(output_tar.members) == 0:
+            os.remove('%s.tar.gz' % output_prefix)
+        if len(error_tar.members) == 0:
+            os.remove('%s_error.tar.gz' % output_prefix)
 
     if options.no_save:
         import pprint
@@ -196,7 +210,3 @@ if __name__ == '__main__':
     cPickle.dump(crawler.handler.items, output, cPickle.HIGHEST_PROTOCOL)
     output.close()
 
-    output_tar.close()
-    error_tar.close()
-    if len(error_tar.members) == 0:
-        os.remove('%s_error.tar.gz' % output_prefix)
