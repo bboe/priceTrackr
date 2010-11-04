@@ -1,21 +1,19 @@
 #!/bin/sh
 
-if [ $# -ne 1 ]
-then
-    echo "Usage: $0 csil_name"
-    exit 1
-fi
-
 echo "Starting: `date`"
 
-host1=bboe@$1.cs.ucsb.edu
-temp_path=seclab/cron_temp
-archive_path=~/hg/priceTrackr/ARCHIVE/
-pt_path=hg/priceTrackr/scripts
 key=~/.ssh/ptrackr.priv
+local_archive_path=~/hg/priceTrackr/ARCHIVE
+
+crawler=bboe@192.35.222.100
+crawler_temp_path=cron_temp
+crawler_script_path=~/hg/priceTrackr/scripts
+
+server=bboe@128.111.48.223
+server_script_path=~/hg/priceTrackr/scripts
 
 # Perform crawl
-ssh $host1 -i $key "rm -rf $temp_path && mkdir $temp_path && cd $temp_path && ../priceTrackr/newegg_crawler.py --threads 4"
+ssh crawler -i $key "rm -rf $crawler_temp_path && mkdir $crawler_temp_path && cd $crawler_temp_path && $crawler_script_path/newegg_crawler.py --threads 4"
 if [ $? -ne 0 ]
 then
     echo "Crawl failed"
@@ -23,7 +21,7 @@ then
 fi
 
 # Copy data to archive folder
-scp -i $key $host1:$temp_path/* $archive_path
+scp -i $key $crawler:$crawler_temp_path/* $local_archive_path/
 if [ $? -ne 0 ]
 then
     echo "SCP data to local failed"
@@ -31,8 +29,8 @@ then
 fi
 
 # Copy pkl file to webserver
-filename=`ls -tr $archive_path/*.pkl | tail -n 1`
-scp -i $key $filename pricetrackr:$pt_path
+filename=`ls -tr $local_archive_path/*.pkl | tail -n 1`
+scp -i $key $filename $server:$server_script_path
 if [ $? -ne 0 ]
 then
     echo "SCP data to remote failed"
@@ -40,7 +38,7 @@ then
 fi
 
 # Remove files on host1
-ssh $host1 -i $key "rm -rf $temp_path"
+ssh $crawler -i $key "rm -rf $temp_path"
 if [ $? -ne 0 ]
 then
     echo "Could not delete files"
@@ -48,7 +46,7 @@ then
 fi
 
 # Insert data into database
-ssh pricetrackr -i $key "cd $pt_path && ./process_data.py *.pkl"
+ssh $server -i $key "cd $server_script_path && ./process_data.py *.pkl"
 if [ $? -ne 0 ]
 then
     echo "Could not import data"
@@ -56,7 +54,7 @@ then
 fi
 
 # Remove file on webserver
-ssh pricetrackr -i $key "rm $pt_path/*.pkl"
+ssh $server -i $key "rm $server_script_path/*.pkl"
 if [ $? -ne 0 ]
 then
     echo "Could not delete pkl file"
@@ -64,7 +62,7 @@ then
 fi
 
 # Generate pages on webserver
-ssh pricetrackr -i $key "$pt_path/generate_pages.py"
+ssh $server -i $key "$server_script_path/generate_pages.py"
 if [ $? -ne 0 ]
 then
     echo "Could not generate pages"
