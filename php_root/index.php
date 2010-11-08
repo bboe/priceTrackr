@@ -22,15 +22,17 @@ if ($data = $Cache_Lite->get($id)) {
 	require_once 'includes/header.php';
 ?>
 
-<h1>priceTrackr is BACK!!!</h1>
-<p>Yes, after two years priceTrackr is finally up and running again. To get
-  started please read the below, or checkout the following products whose
-  price history is rather interesting.</p>
+<h1>Track your newegg products' price history!</h1>
+<p>priceTrackr regularly crawls newegg to get updated prices for many of your
+favorite newegg items. Use priceTrackr Look up the price history for an item
+you are interested in purchasing on newegg. priceTrackr will help to inform you
+if <em>now</em is a good time to purchase the item, or conversely, priceTrackr can show you that the item is currently at the highest price it's been.</p>
+<p>See the examples below to get familiar with priceTrackr:</p>
 
 <ul>
-  <li><a href="/i/N82E16833124349/">Real newegg product, example 1</a></li>
-  <li><a href="/i/N82E16820145262/">Real newegg product, example 2</a></li>
-  <li><a href="/i/N82E16820145247/">Real newegg product, example 3</a></li>
+  <li><a href="/i/N82E16819115214/">N82E16819115214: Intel Core i7-860</a></li>
+  <li><a href="/i/N82E16820227461/">N82E16820227461: OCZSSD2-1AGT60G</a></li>
+  <li><a href="/i/N82E16814150447/">N82E16814150447: XFX HD-577A-ZNFC</a></li>
 </ul>
 
 <h2>What is priceTrackr?</h2>
