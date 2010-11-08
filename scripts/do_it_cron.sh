@@ -9,8 +9,8 @@ crawler=bboe@192.35.222.100
 crawler_temp_path=cron_temp
 crawler_script_path=~/hg/priceTrackr/scripts
 
-server=bboe@128.111.48.223
-server_script_path=~/hg/priceTrackr/scripts
+server=bryce@128.111.48.223
+server_script_path=./hg/priceTrackr/scripts
 
 # Perform crawl
 ssh crawler -i $key "rm -rf $crawler_temp_path && mkdir $crawler_temp_path && cd $crawler_temp_path && $crawler_script_path/newegg_crawler.py --threads 4"

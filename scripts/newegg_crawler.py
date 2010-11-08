@@ -192,12 +192,13 @@ if __name__ == '__main__':
             crawler.do_crawl(limit=options.limit, start=options.start,
                              threads=options.threads)
     finally:
-        output_tar.close()
-        error_tar.close()
-        if len(output_tar.members) == 0:
-            os.remove('%s.tar.gz' % output_prefix)
-        if len(error_tar.members) == 0:
-            os.remove('%s_error.tar.gz' % output_prefix)
+        if output_tar:
+            output_tar.close()
+            error_tar.close()
+            if len(output_tar.members) == 0:
+                os.remove('%s.tar.gz' % output_prefix)
+            if len(error_tar.members) == 0:
+                os.remove('%s_error.tar.gz' % output_prefix)
 
     if options.no_save:
         import pprint
