@@ -59,6 +59,10 @@ class NewEggCrawlHandler(crawle.Handler):
                           '%22NVS%255FCUSTOMER%255FZIP%255FCODE%22%3a',
                           '%2293117%22%7d%7d%7d%7d'])
 
+    ITEM = 0
+    CART = 1
+    MAPPING = 2
+
     @staticmethod
     def transform_id(id):
         return '%s-%s-%s' % (id[7:9], id[9:12], id[12:])
@@ -102,18 +106,19 @@ class NewEggCrawlHandler(crawle.Handler):
     def pre_process(self, rr):
         if not isinstance(rr.request_url, tuple):
             print 'Something slid by: %s' % rr.response_url
-        id, type = rr.request_url
-        if type == 0: # ITEM
-            rr.response_url = ''.join([self.ITEM_URL_PREFIX, id])
-        elif type == 1: # CART
+        item_id, r_type = rr.request_url
+        if r_type == self.ITEM:
+            rr.response_url = ''.join([self.ITEM_URL_PREFIX, item_id])
+        elif r_type == self.CART:
             rr.response_url = self.CART_URL
             c_id = ''.join(['NV%5FNEWEGGCOOKIE=#4{"Sites":{"USA":{"Values":{"',
-                            self.transform_id(id), '":"1"}}}}'])
+                            self.transform_id(item_id), '":"1"}}}}'])
             rr.request_headers = {'Cookie':';'.join([self.ZIP_COOKIE, c_id])}
-        elif type == 2: # MAPPING
-            rr.response_url = ''.join([self.MAP_URL_PREFIX, id])
+        elif r_type == self.MAPPING:
+            rr.response_url = ''.join([self.MAP_URL_PREFIX, item_id])
         else:
-            raise 'Unknown Type'
+            raise Exception('Unknown type')
+        rr.redirects = 0
 
     def process(self, rr, queue):
         if rr.response_status == None:
@@ -130,27 +135,27 @@ class NewEggCrawlHandler(crawle.Handler):
         elif rr.response_status != 200:
             self.handle_error(rr)
             return
-        id, type = rr.request_url
-        if type == 0: # ITEM
-            info = self.parser.parse_item_page_info(id, rr.response_body)
+        item_id, r_type = rr.request_url
+        if r_type == self.ITEM:
+            info = self.parser.parse_item_page_info(item_id, rr.response_body)
             if not info:
                 return
             if 'deactivated' not in info and 'price' not in info:
-                queue.put((id, 1))
-        elif type == 1: # CART
-            info = self.parser.parse_cart_page(id, rr.response_body)
+                queue.put((item_id, self.CART))
+        elif r_type == self.CART:
+            info = self.parser.parse_cart_page(item_id, rr.response_body)
             if not info:
-                queue.put((id, 2))
+                queue.put((item_id, self.MAPPING))
                 return
-        elif type == 2: # MAPPING
-            info = self.parser.parse_mapping_page(id, rr.response_body)
+        elif r_type == self.MAPPING:
+            info = self.parser.parse_mapping_page(item_id, rr.response_body)
         else:
-            raise 'Unknown Type'
+            raise Exception('Unknown Type')
         self.lock.acquire()
-        if type == 0:
-            self.items[id] = info
+        if r_type == self.ITEM:
+            self.items[item_id] = info
         else:
-            self.items[id].update(info)
+            self.items[item_id].update(info)
         self.lock.release()
         self.save_page(rr)
 
