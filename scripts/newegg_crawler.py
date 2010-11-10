@@ -5,12 +5,8 @@ from StringIO import StringIO
 from page_parser import PageParser
 
 class NewEggCrawler(object):
-    SITEMAP_URL_PREFIX = 'http://www.newegg.com/Sitemap/USA/'
-    SITEMAPS = ['newegg_sitemap_product01.xml.gz',
-                'newegg_sitemap_product02.xml.gz',
-                'newegg_sitemap_product03.xml.gz',
-                'newegg_sitemap_product04.xml.gz',
-                'newegg_sitemap_product05.xml.gz']
+    SITEMAP_INDEX = 'http://www.newegg.com/Siteindex_USA.xml'
+    LOC_RE = re.compile('<loc>([^<]+)</loc>')
     ITEM_ID_RE = re.compile(''.join(['http://www.newegg.com/Product/',
                                      'Product.aspx\?Item=([A-Z0-9]+)']))
 
@@ -20,18 +16,22 @@ class NewEggCrawler(object):
         self.handler = NewEggCrawlHandler(output_tar, error_tar, save)
         self.queue = crawle.URLQueue()
 
+    def get_sitemaps(self):
+        rr = crawle.quick_request(self.SITEMAP_INDEX, redirects=1)
+        if rr.response_status != 200:
+            print 'Could not get index: %d' % rr.response_status
+            sys.exit(1)
+        data = rr.response_body
+        return [x for x in self.LOC_RE.findall(data) if 'product' in x]
+
     def get_product_ids(self):
-        for sitemap in [''.join([self.SITEMAP_URL_PREFIX, x]) for x
-                        in self.SITEMAPS]:
-            cc = crawle.HTTPConnectionControl(crawle.Handler())
-            rr = crawle.RequestResponse(sitemap, redirects=None)
-            try:
-                cc.request(rr)
-            except socket.error:
-                sys.exit(1)
+        sitemaps = self.get_sitemaps()
+        for sitemap in sitemaps:
+            rr = crawle.quick_request(sitemap, redirects=1)
             if rr.response_status != 200:
-                print 'Error'
-                break
+                print 'Error fetching sitemap: %d' % rr.response_status
+                print rr.request_url, rr.response_url
+                sys.exit(1)
             body = gzip.GzipFile(fileobj=StringIO(rr.response_body)).read()
             self.item_ids.extend(self.ITEM_ID_RE.findall(body))
 
@@ -192,12 +192,13 @@ if __name__ == '__main__':
             crawler.do_crawl(limit=options.limit, start=options.start,
                              threads=options.threads)
     finally:
-        output_tar.close()
-        error_tar.close()
-        if len(output_tar.members) == 0:
-            os.remove('%s.tar.gz' % output_prefix)
-        if len(error_tar.members) == 0:
-            os.remove('%s_error.tar.gz' % output_prefix)
+        if output_tar:
+            output_tar.close()
+            error_tar.close()
+            if len(output_tar.members) == 0:
+                os.remove('%s.tar.gz' % output_prefix)
+            if len(error_tar.members) == 0:
+                os.remove('%s_error.tar.gz' % output_prefix)
 
     if options.no_save:
         import pprint
