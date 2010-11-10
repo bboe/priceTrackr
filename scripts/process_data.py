@@ -2,6 +2,9 @@
 import cPickle, os, re, string, sys, time, warnings
 import MySQLdb
 
+class NoPriceException(Exception): pass
+class NoTitleException(Exception): pass
+
 class ItemHistoryHelper(object):
     ID_RE = re.compile('N82E168(\d+)((IN)|R|(SF))?')
     RF = 1
@@ -25,15 +28,15 @@ class ItemHistoryHelper(object):
 
     def __init__(self, id, item):
         self.id = id
-        if 'title' not in item:
-            raise Exception('Incomplete Item')
+        if 'title' not in item or item['title'] == None:
+            raise NoTitleException()
         self.title = item['title']
         if item['model'] != None:
             self.model = item['model']
         else:
             self.model = ''
-        if 'price' not in item:
-            raise Exception('Incomplete Item')
+        if 'price' not in item or item['price'] == None:
+            raise NoPriceException()
         self.price = self.convert_price(item['price'])
         if item['original'] != None:
             self.original = self.convert_price(item['original'])
@@ -142,11 +145,11 @@ if __name__ == '__main__':
             continue
         try:
             i = ItemHistoryHelper(id, item)
-        except Exception, e:
-            if e.args == ('Incomplete Item',): continue
-            else: raise
-        if i.title == None:
-            print 'No title: %s' % id
+        except NoTitleException:
+            print '%20s No title' % id
+            continue
+        except NoPriceException:
+            print '%20s No price' % id
             continue
         if not (i.verify_savings() and i.verify_text()):
             continue
