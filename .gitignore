@@ -1,5 +1,3 @@
-syntax: glob
-
 *.pyc
 ARCHIVE
 nginx_root/daily*
