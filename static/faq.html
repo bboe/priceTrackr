@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>FAQ &raquo; priceTrackr</title>
+  <meta http-equiv="Content-Type" content=
+  "text/html; charset=us-ascii" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="/layout.css" />
+</head>
+
+<body>
+  <div id="container">
+    <div id="header">
+      <h1><a href="/">priceTrackr</a></h1>
+    </div>
+
+    <div id="menu">
+      <ul id="nav">
+        <li><a href="/">Home</a></li>
+
+        <li><a href="/faq/" class="active">FAQ</a></li>
+
+        <li><a href="/about/">About</a></li>
+      </ul>
+    </div>
+
+    <div id="content">
+      <h1>Frequently Asked Questions</h1>
+
+      <ol>
+        <li><a href="#a">Why create priceTrackr?</a></li>
+
+        <li><a href="#b">Why are there holes for some dates in the
+        charts?</a></li>
+
+        <li><a href="#c">How should the charts be
+        interpreted?</a></li>
+
+        <li><a href="#d">How is the daily drops page
+        sorted?</a></li>
+
+        <li><a href="#e">What does priceTrackr use to make the
+        awesome charts?</a></li>
+      </ol>
+
+      <div class="faq">
+        <h4><a id="a" name="a"></a>Why create priceTrackr?</h4>
+
+        <div class="answer">
+          <p>priceTrackr was created so that one can make a more
+          informed decision before purchasing items on Newegg.</p>
+        </div>
+      </div>
+
+      <div class="faq">
+        <h4><a id="b" name="b"></a>Why are there holes for some
+        dates in the charts?</h4>
+
+        <div class="answer">
+          <p>Holes can appear in a chart for a few reasons. A crawl
+          of Newegg may not have occurred on that date, an error
+          may have occurred while crawling a specific item, or an
+          item was placed in a deactivated state on Newegg. Except
+          for in the case of a deactivated item, it should be
+          pretty easy to extrapolate what the prices on the missing
+          dates were.</p>
+        </div>
+      </div>
+
+      <div class="faq">
+        <h4><a id="c" name="c"></a>How should the charts be
+        interpreted?</h4>
+
+        <div class="answer">
+          <p>Each chart has four lines. The first line, "original",
+          is the price one of the item in the absence of savings,
+          rebates and shipping. The second line, "+ savings", is
+          the price after Newegg's instant savings on the item.
+          This is the cost to purchase the item, when not
+          considering the cost of shipping. The third line, "+
+          rebates", is the previous price with any rebates also
+          added on. The final line, "original + shipping", allows
+          one to track the variance in shipping over time with
+          respect to the original price.</p>
+
+          <p>The best way to look at the specific pieces is to
+          compare them to the other lines. When "+ savings" differs
+          from the original, then at that point in time there was
+          savings on the item. Likewise when "+ rebates" differs
+          from "+ savings" there was rebates on the item.</p>
+
+          <p>The reason for comparing the shipping to the original
+          price, rather than to tack on after the rebates price is
+          that the original price varries much less than the
+          rebates price, therefore it is simpler to monitor
+          variations in the shipping price as is.</p>
+        </div>
+      </div>
+
+      <div class="faq">
+        <h4><a id="d" name="d"></a>How is the daily drops page
+        sorted?</h4>
+
+        <div class="answer">
+          <p>The daily drops page is sorted in descending order
+          based on the computed drop score each item receives. The
+          drop score is computed by taking the cost drop of an item
+          (yesterday's price - today's price) and multiplying that
+          with the percent drop of an item (cost drop / yesterday's
+          price).</p>
+        </div>
+      </div>
+
+      <div class="faq">
+        <h4><a id="e" name="e"></a>What does priceTrackr use to
+        make the awesome charts?</h4>
+
+        <div class="answer">
+          <p>priceTrackr uses <a href=
+          "http://www.maani.us/charts4/">XML/SWF Charts</a> version
+          4.7 to make the awesome charts.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer">
+      <div class="copyright">
+        &copy; 2011 priceTrackr. All Rights Reserved
+      </div>
+    </div>
+  </div><script type="text/javascript">
+//<![CDATA[
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  //]]>
+  </script><script type="text/javascript">
+//<![CDATA[
+  try {
+  var pageTracker = _gat._getTracker("UA-510348-5");
+  pageTracker._setDomainName(".pricetrackr.com");
+  pageTracker._trackPageview();
+  } catch(err) {}
+  //]]>
+  </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+User-agent: *
+
+Disallow: /g/
+
+Sitemap: http://www.pricetrackr.com/sitemap.xml.gz
