@@ -5,7 +5,6 @@ RewriteCond %{HTTP_HOST}   !^www\.pricetrackr\.com [NC]
 RewriteCond %{HTTP_HOST}   !^$
 RewriteRule ^(.*)         http://www.pricetrackr.com/$1 [L,R=301]
 
-RewriteRule ^i/([A-Z0-9]+)/?$ /items/$1.html [L]
 RewriteRule ^about/?$ /about.html [L]
 RewriteRule ^faq/?$ /faq.html [L]
 
